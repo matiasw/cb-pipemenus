@@ -1,3 +1,9 @@
+cb-pipemenus (0.06) unstable; urgency=low
+
+  * Add John Crawley's "Places" & "Recent Files" pipemenus.
+
+ -- Philip Newborough <corenominal@corenominal.org>  Wed, 25 Jul 2012 09:11:46 +0100
+
 cb-pipemenus (0.05) unstable; urgency=low
 
   * Modified 'connectiontest' function to use the reliable wget 

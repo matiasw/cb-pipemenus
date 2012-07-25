@@ -21,6 +21,8 @@ install:
 	dh_install cb-compositor /usr/bin
 	dh_install cb-sshconfig-pipemenu /usr/bin
 	dh_install cb-include.cfg /usr/bin
+	dh_install cb-places-pipemenu /usr/bin
+	dh_install cb-recent-files-pipemenu /usr/bin
 	dh_testdir
 	dh_testroot
 
