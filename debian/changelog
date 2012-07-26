@@ -1,3 +1,15 @@
+cb-pipemenus (0.07) unstable; urgency=low
+
+  [ John Crawley ]
+  * cb-places-pipemenu:
+    - References to scriptname in comments updated to cb-places-pipemenu.
+  * cb-recent-files-pipemenu:
+    - Updated references to recently_opened_menu.sh to cb-recent-files-menu.
+    - Outputs error message in menu if recently-used.xbel cannot be found.
+    - Escape _ to __ in menu labels.
+
+ -- Philip Newborough <corenominal@corenominal.org>  Thu, 26 Jul 2012 08:01:49 +0100
+
 cb-pipemenus (0.06) unstable; urgency=low
 
   * Add John Crawley's "Places" & "Recent Files" pipemenus.
