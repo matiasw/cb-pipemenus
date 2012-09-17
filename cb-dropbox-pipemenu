@@ -131,7 +131,7 @@ if [ ! -d $USERDBDIR ]; then
 		<item label="Find out more about Dropbox">
             <action name="Execute">
 				<execute>
-					x-www-browser https://www.dropbox.com/referrals/NTE2Njc5MTMyOQ?src=global0
+					x-www-browser http://db.tt/H3VDytvT
 				</execute>
 			</action>
 		</item>
