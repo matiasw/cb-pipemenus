@@ -38,6 +38,12 @@ if [ "$1" = "--restart" ]; then
     fi
     exit 0
 fi
+if [ "$1" = "--watch" ]; then
+    while inotifywait -e modify /home/$USER/.config/compton.conf; do
+        cb-compositor --restart
+    done
+    exit 0
+fi
 # Output Openbox menu
 if [ ! "$(pidof compton)" ]; then
     cat << _EOF_
