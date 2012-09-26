@@ -4,6 +4,8 @@ cb-pipemenus (0.09) unstable; urgency=low
   * Add watch option to compositing menu/script.
   * Add notify-tools to depends.
   * Add cb-metapackage to depends.
+  * Update dropbox referal code for Jo.
+  * Update pipemenu syntax, replacing depreciated <execute>'s to <command>.
 
  -- Philip Newborough <corenominal@corenominal.org>  Wed, 26 Sep 2012 20:50:04 +0100
 
