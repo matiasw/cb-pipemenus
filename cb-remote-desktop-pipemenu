@@ -132,9 +132,9 @@ if [ -x "/usr/bin/xtightvncviewer" ];then
     cat << _menu_
 	    <item label="Viewer">
             <action name="Execute">
-				<execute>
+				<command>
 					vncviewer
-				</execute>
+				</command>
 			</action>
 		</item>
 		<separator/>
@@ -143,9 +143,9 @@ else
     cat << _menu_
 	    <item label="Install Viewer">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-remote-desktop-pipemenu --viewer
-				</execute>
+				</command>
 			</action>
 		</item>
 		<separator/>
@@ -159,9 +159,9 @@ if [ -x "/usr/lib/vino/vino-server" ];then
 		cat << _menu_
 	    <item label="Stop VNC Server">
             <action name="Execute">
-				<execute>
+				<command>
 					killall vino-server
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -169,9 +169,9 @@ _menu_
 		cat << _menu_
 	    <item label="Start VNC Server">
             <action name="Execute">
-				<execute>
+				<command>
 					/usr/lib/vino/vino-server
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -179,9 +179,9 @@ _menu_
 		cat << _menu_
 	    <item label="VNC Server Preferences">
             <action name="Execute">
-				<execute>
+				<command>
 					vino-preferences
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -189,9 +189,9 @@ else
 	cat << _menu_
 	    <item label="Install VNC Server">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-remote-desktop-pipemenu --server
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_

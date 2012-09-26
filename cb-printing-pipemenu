@@ -76,9 +76,9 @@ if [ -x "/usr/bin/system-config-printer" ];then
     cat << _scf_
 	    <item label="Configure Printers">
             <action name="Execute">
-				<execute>
+				<command>
 					gksudo system-config-printer
-				</execute>
+				</command>
 			</action>
 		</item>
 _scf_
@@ -88,9 +88,9 @@ if [ $INSTALLED = false ]; then
     cat << _install_
 	    <item label="Install Printing Support">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-printing-pipemenu --install
-				</execute>
+				</command>
 			</action>
 		</item>
 _install_

@@ -291,16 +291,16 @@ if [ -x "/usr/bin/chromium-browser" ];then
     cat << _menu_
 	    <item label="Chromium Browser">
             <action name="Execute">
-				<execute>
+				<command>
 					chromium-browser
-				</execute>
+				</command>
 			</action>
 		</item>
 		<item label="Chromium Browser (Private Mode)">
             <action name="Execute">
-				<execute>
+				<command>
 					chromium-browser --incognito
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -308,9 +308,9 @@ else
 	cat << _menu_
 	    <item label="Install Chromium Browser">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-x-www-browser-pipemenu --chromium-browser
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -322,9 +322,9 @@ if [ -x "/usr/bin/iceweasel" ];then
     cat << _menu_
 	    <item label="Iceweasel">
             <action name="Execute">
-				<execute>
+				<command>
 					iceweasel
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -332,9 +332,9 @@ else
 	cat << _menu_
 	    <item label="Install Iceweasel">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-x-www-browser-pipemenu --iceweasel
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -346,16 +346,16 @@ if [ -x "/usr/bin/google-chrome" ];then
     cat << _menu_
 	    <item label="Google Chrome">
             <action name="Execute">
-				<execute>
+				<command>
 					google-chrome
-				</execute>
+				</command>
 			</action>
 		</item>
 		<item label="Google Chrome (Private Mode)">
             <action name="Execute">
-				<execute>
+				<command>
 					google-chrome --incognito
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -363,9 +363,9 @@ else
 	cat << _menu_
 	    <item label="Install Google Chrome">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-x-www-browser-pipemenu --google-chrome
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -377,9 +377,9 @@ if [ -x "/usr/bin/opera" ];then
     cat << _menu_
 	    <item label="Opera">
             <action name="Execute">
-				<execute>
+				<command>
 					opera
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -387,9 +387,9 @@ else
 	cat << _menu_
 	    <item label="Install Opera">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-x-www-browser-pipemenu --opera
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_
@@ -401,9 +401,9 @@ if [ $I -gt 1 ];then
 	    <separator/>
 	    <item label="Select default browser">
             <action name="Execute">
-				<execute>
+				<command>
 					terminator --command="sudo update-alternatives --config x-www-browser"
-				</execute>
+				</command>
 			</action>
 		</item>
 _menu_

@@ -76,9 +76,9 @@ if [ -x "/usr/bin/lowriter" ];then
     cat << _lowriter_
 	    <item label="Writer">
             <action name="Execute">
-				<execute>
+				<command>
 					lowriter
-				</execute>
+				</command>
 			</action>
 		</item>
 _lowriter_
@@ -90,9 +90,9 @@ if [ -x "/usr/bin/localc" ];then
     cat << _localc_
 	    <item label="Calc">
             <action name="Execute">
-				<execute>
+				<command>
 					localc
-				</execute>
+				</command>
 			</action>
 		</item>
 _localc_
@@ -104,9 +104,9 @@ if [ -x "/usr/bin/loimpress" ];then
     cat << _loimpress_
 	    <item label="Impress">
             <action name="Execute">
-				<execute>
+				<command>
 					loimpress
-				</execute>
+				</command>
 			</action>
 		</item>
 _loimpress_
@@ -118,9 +118,9 @@ if [ -x "/usr/bin/lodraw" ];then
     cat << _lodraw_
 	    <item label="Draw">
             <action name="Execute">
-				<execute>
+				<command>
 					lodraw
-				</execute>
+				</command>
 			</action>
 		</item>
 _lodraw_
@@ -132,9 +132,9 @@ if [ -x "/usr/bin/lobase" ];then
     cat << _lobase_
 	    <item label="Base">
             <action name="Execute">
-				<execute>
+				<command>
 					lobase
-				</execute>
+				</command>
 			</action>
 		</item>
 _lobase_
@@ -144,9 +144,9 @@ if [ $INSTALLED = false ]; then
     cat << _loinstall_
 	    <item label="Install LibreOffice">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-libreoffice-pipemenu --install
-				</execute>
+				</command>
 			</action>
 		</item>
 _loinstall_

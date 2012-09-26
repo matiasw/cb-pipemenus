@@ -122,24 +122,24 @@ if [ ! -d $USERDBDIR ]; then
     <openbox_pipe_menu>
 	    <item label="Install Dropbox">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-dropbox-pipemenu --install-dropbox
-				</execute>
+				</command>
 			</action>
 		</item>
 		<separator/>
 		<item label="Find out more about Dropbox">
             <action name="Execute">
-				<execute>
+				<command>
 					x-www-browser http://db.tt/5mJg9lb
-				</execute>
+				</command>
 			</action>
 		</item>
 		<item label="Dropbox Terms">
             <action name="Execute">
-				<execute>
+				<command>
 					x-www-browser https://www.dropbox.com/terms
-				</execute>
+				</command>
 			</action>
 		</item>
     </openbox_pipe_menu>
@@ -151,9 +151,9 @@ else
         cat << _dropboxhomedirlink_
         <item label="Open Dropbox Folder">
             <action name="Execute">
-				<execute>
+				<command>
 					thunar /home/$USER/Dropbox
-				</execute>
+				</command>
 			</action>
 		</item>
 _dropboxhomedirlink_
@@ -162,9 +162,9 @@ _dropboxhomedirlink_
         cat << _startdropbox_
         <item label="Start Dropbox">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-dropbox-pipemenu --start-dropbox
-				</execute>
+				</command>
 			</action>
 		</item>
 _startdropbox_
@@ -172,9 +172,9 @@ _startdropbox_
     cat << _stopdropbox_
         <item label="Stop Dropbox">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-dropbox-pipemenu --stop-dropbox
-				</execute>
+				</command>
 			</action>
 		</item>
 _stopdropbox_
@@ -183,16 +183,16 @@ _stopdropbox_
     <separator/>
 		<item label="Launch Dropbox Website">
             <action name="Execute">
-				<execute>
+				<command>
 					x-www-browser https://www.dropbox.com/home
-				</execute>
+				</command>
 			</action>
 		</item>
 		<item label="Dropbox Terms">
             <action name="Execute">
-				<execute>
+				<command>
 					x-www-browser https://www.dropbox.com/terms
-				</execute>
+				</command>
 			</action>
 		</item>
     </openbox_pipe_menu>
