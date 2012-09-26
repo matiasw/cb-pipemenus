@@ -6,27 +6,17 @@
 
 
 # ------------- Set xcompmgr command options -----------------------------------
-if [ -f /home/$USER/.config/compton/comptonrc ]; then
-    . /home/$USER/.config/compton/comptonrc
-else
-    EXECXCOMP='compton -cC -fF -I 0.065 -O 0.065 -D 6 -m 0.8 -G -b'
-fi
+EXECXCOMP='compton'
 
 # Edit xcompmgr settings
 if [ "$1" = "--edit" ]; then
-    if [ ! -d /home/$USER/.config/compton ]; then
-        mkdir /home/$USER/.config/compton
-    fi
-    if [ ! -f /home/$USER/.config/compton/comptonrc ]; then
-        touch /home/$USER/.config/compton/comptonrc
-        echo "# compton start-up command used by CrunchBang's compositing pipemenu." > /home/$USER/.config/compton/comptonrc
-        echo "# See 'man compton' for details about how to modify these settings." >> /home/$USER/.config/compton/comptonrc
-        echo "EXECXCOMP='compton -cC -fF -I 0.065 -O 0.065 -D 6 -m 0.8 -G -b'" >> /home/$USER/.config/compton/comptonrc
+    if [ ! -f /home/$USER/.config/compton.conf ]; then
+        cp /etc/xdg/compton.conf /home/$USER/.config/compton.conf
     fi
     if [ -x "/usr/bin/geany" ]; then
-        geany /home/$USER/.config/compton/comptonrc &
+        geany /home/$USER/.config/compton.conf &
     else
-        terminator --command="nano /home/$USER/.config/compton/comptonrc"
+        terminator --command="nano /home/$USER/.config/compton.conf"
     fi
     exit 0
 fi
@@ -43,7 +33,7 @@ fi
 
 if [ "$1" = "--restart" ]; then
     if [ "$(pidof compton)" ]; then
-        killall compton && sleep 2s
+        killall compton && sleep 1s
         cb-compositor --start
     fi
     exit 0
@@ -54,16 +44,16 @@ if [ ! "$(pidof compton)" ]; then
     <openbox_pipe_menu>
 	    <item label="Enable Compositing">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-compositor --start
-				</execute>
+				</command>
 			</action>
 		</item>
 		<item label="Edit Compositing Settings">
             <action name="Execute">
-				<execute>
+				<command>
 					cb-compositor --edit
-				</execute>
+				</command>
 			</action>
 		</item>
     </openbox_pipe_menu>
@@ -73,18 +63,26 @@ else
     <openbox_pipe_menu>
 				<item label="Restart Compositing">
 					<action name="Execute">
-						<execute>
+						<command>
 							cb-compositor --restart
-						</execute>
+						</command>
 					</action>
 				</item>
 				<item label="Disable Compositing">
 					<action name="Execute">
-						<execute>
+						<command>
 							cb-compositor --toggle
-						</execute>
+						</command>
 					</action>
 				</item>
+                <separator/>
+                <item label="Edit Compositing Settings">
+                    <action name="Execute">
+                        <command>
+                            cb-compositor --edit
+                        </command>
+                    </action>
+                </item>
     </openbox_pipe_menu>
 _EOF_
 fi
