@@ -8,7 +8,7 @@ Homepage: http://crunchbang.org/
 
 Package: cb-pipemenus
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, openbox, zenity, terminator, wget, compton-git, curl, tar, python, python-paramiko, inotify-tools
+Depends: ${shlibs:Depends}, ${misc:Depends}, openbox, zenity, terminator, wget, compton-git, curl, tar, python, python-paramiko, inotify-tools, cb-metapackage
 Description: various Openbox pipemenus.
  Contains various Openbox pipemenus for use with
  CrunchBang Linux.
