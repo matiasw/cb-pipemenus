@@ -11,7 +11,7 @@
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
-#    Version 2012/06/19-cb
+#    Version 2012/09/27-cb
 
 #    NB The shell, not bash, is invoked in the hope that
 #    dash will be used, as it is much faster.
@@ -81,17 +81,19 @@ path="$( echo "${path}"/ | tr -s '/' )"    # ensure one final slash
 [ -d "$path" ] || { echo "$0 : $path is not a directory" >&2; exit 1; }
 
 case "$path" in    # only escape if string needs it
-*\&*|*\<*|*\>*|*\"*|*\'*) pathe=$(sed "s/\&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/\"/\&quot;/g;s/'/\&apos;/g;") <<XXX
+*\&*|*\<*|*\>*|*\"*|*\'*) pathe=$(sed "s/\&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/\"/\&quot;/g;s/'/\&apos;/g;" <<XXX
 $path
 XXX
+)
 ;;
 *)pathe=$path;;
 esac
 
 case "$pathe" in
-*\&apos\;*) pathe_apos=$(sed 's/\&apos;/\&apos;\&quot;\&apos;\&quot;\&apos;/g;')<<XXX
+*\&apos\;*) pathe_apos=$(sed 's/\&apos;/\&apos;\&quot;\&apos;\&quot;\&apos;/g;'<<XXX
 $pathe
 XXX
+)
 ;;
 *) pathe_apos=$pathe;;
 esac
@@ -114,23 +116,26 @@ do
     [ -e "$i" ] || continue    # only output code if file exists
     shortname="${i##*/}"
 	case $shortname in
-	*\&*|*\<*|*\>*|*\"*|*\'*) shortnamee=$(sed "s/\&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/\"/\&quot;/g;s/'/\&apos;/g;") <<XXX
+	*\&*|*\<*|*\>*|*\"*|*\'*) shortnamee=$(sed "s/\&/\&amp;/g;s/</\&lt;/g;s/>/\&gt;/g;s/\"/\&quot;/g;s/'/\&apos;/g;" <<XXX
 $shortname
 XXX
+)
     ;;
     *) shortnamee=$shortname;;
     esac
     case $shortnamee in
-    *\&apos\;*) shortnamee_apos=$(sed 's/\&apos;/\&apos;\&quot;\&apos;\&quot;\&apos;/g;')<<XXX
+    *\&apos\;*) shortnamee_apos=$(sed 's/\&apos;/\&apos;\&quot;\&apos;\&quot;\&apos;/g;'<<XXX
 $shortnamee
 XXX
+)
     ;;
     *) shortnamee_apos=$shortnamee;;
     esac
     case $shortnamee in
-    *_*) shortnamee_label=$(sed 's/_/__/g;')<<XXX
+    *_*) shortnamee_label=$(sed 's/_/__/g;'<<XXX
 $shortnamee
 XXX
+)
     ;;
     *) shortnamee_label=$shortnamee;;
     esac
