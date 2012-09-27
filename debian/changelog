@@ -1,3 +1,11 @@
+cb-pipemenus (0.10) unstable; urgency=low
+
+  [ John Crawley ]
+  * cb-places-pipemenu:
+    - Portability fix. Now no longer breaks if run on bash instead of dash.
+
+ -- Philip Newborough <corenominal@corenominal.org>  Thu, 27 Sep 2012 17:33:47 +0100
+
 cb-pipemenus (0.09) unstable; urgency=low
 
   * Update compositing menu to work with new compton config.
