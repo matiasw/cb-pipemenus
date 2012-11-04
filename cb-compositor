@@ -6,7 +6,11 @@
 
 
 # ------------- Set xcompmgr command options -----------------------------------
-EXECXCOMP='compton'
+if glxinfo | egrep -iq 'direct rendering: yes'; then
+    EXECXCOMP='compton --vsync opengl'
+else
+    EXECXCOMP='compton'
+fi
 
 # Edit xcompmgr settings
 if [ "$1" = "--edit" ]; then
