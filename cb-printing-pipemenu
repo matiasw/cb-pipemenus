@@ -40,7 +40,7 @@ if [ "$1" = "--install-printing" ]; then
         sleep 2s
         sudo apt-get update
         clear
-        if ! sudo apt-get install -y cups cups-pdf system-config-printer printer-driver-hpijs; then
+        if ! sudo apt-get install -y cb-meta-printer-support; then
             clear
             echo ""
             echo "  There was a problem installing printing packages."
