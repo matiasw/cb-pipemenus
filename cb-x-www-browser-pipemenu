@@ -287,7 +287,7 @@ echo "    <openbox_pipe_menu>"
 
 # Chromium
 if [ -x "/usr/bin/chromium-browser" ];then
-    I=$((I+1))
+    ((I++))
     cat << _menu_
 	    <item label="Chromium Browser">
             <action name="Execute">
@@ -318,7 +318,7 @@ fi
 
 # Iceweasel
 if [ -x "/usr/bin/iceweasel" ];then
-    I=$((I+1))
+    ((I++))
     cat << _menu_
 	    <item label="Iceweasel">
             <action name="Execute">
@@ -342,7 +342,7 @@ fi
 
 # Google Chrome
 if [ -x "/usr/bin/google-chrome" ];then
-    I=$((I+1))
+    ((I++))
     cat << _menu_
 	    <item label="Google Chrome">
             <action name="Execute">
@@ -373,7 +373,7 @@ fi
 
 # Opera
 if [ -x "/usr/bin/opera" ];then
-    I=$((I+1))
+    ((I++))
     cat << _menu_
 	    <item label="Opera">
             <action name="Execute">
@@ -396,7 +396,7 @@ _menu_
 fi
 
 # Configure default
-if [ $I -gt 1 ];then
+if (( I > 1 )); then
     cat << _menu_
 	    <separator/>
 	    <item label="Select default browser">

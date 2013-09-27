@@ -10,38 +10,37 @@ if [[ -f $pathto/cb-include.cfg ]]
 then
     source "$pathto/cb-include.cfg"
 else
-    echo "  Failed to locate cb-include.cfg"
+    echo '  Failed to locate cb-include.cfg'
     exit 1
 fi
 
 I=0
 
-if [ "$1" = "--viewer" ]; then
-    terminator --title="Install VNC Viewer" --command="cb-remote-desktop-pipemenu --install-viewer"
+if [[ $1 = '--viewer' ]]; then
+    terminator --title='Install VNC Viewer' --command='cb-remote-desktop-pipemenu --install-viewer'
     exit 0
 fi
 
-if [ "$1" = "--server" ]; then
-    terminator --title="Install VNC Server" --command="cb-remote-desktop-pipemenu --install-server"
+if [[ $1 = '--server' ]]; then
+    terminator --title='Install VNC Server' --command='cb-remote-desktop-pipemenu --install-server'
     exit 0
 fi
 
-if [ "$1" = "--install-viewer" ]; then
+if [[ $1 = '--install-viewer' ]]; then
     clear
-    echo ""
-    echo "  INSTALL REMOTE DESKTOP CLIENT"
-    echo "  -----------------------------"
-    echo "  This script will install TightVNC Viewer."
-    echo ""
-    echo -n "  Run the installer now? (Y|n) > "
+    echo
+    echo '  INSTALL REMOTE DESKTOP CLIENT'
+    echo '  -----------------------------'
+    echo '  This script will install TightVNC Viewer.'
+    echo
+    echo -n '  Run the installer now? (Y|n) > '
     read a
-    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
-    [ "$a" = "" ]; then
+    if [[ ${a,} = "y" || ! $a ]]; then
         
         connectiontest
         
         #update sources
-        echo "  Updating sources..."
+        echo '  Updating sources...'
 		sleep 2s
 		sudo apt-get update
 		clear
@@ -49,48 +48,45 @@ if [ "$1" = "--install-viewer" ]; then
         
         if ! sudo apt-get install -y xtightvncviewer; then
             clear
-            echo ""
-            echo "  There was a problem installing TightVNC viewer."
-            echo ""
-            echo "  Hit any key to try again, or \"q\" to quit..."
+            echo
+            echo '  There was a problem installing TightVNC viewer.'
+            echo
+            echo '  Hit any key to try again, or "q" to quit...'
             read -n1 a
-            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
+            if [[ ${a,} = 'q' ]]; then
                 clear
-                exit 0
             else
                 cb-remote-desktop-pipemenu --install-viewer
-                exit 0
             fi
+            exit 0
         else
             clear
-            echo ""
-            echo "  TightVNC viewer has been installed successfully."
-            echo ""
-            echo "  Hit any key to exit..."
+            echo
+            echo '  TightVNC viewer has been installed successfully.'
+            echo
+            echo '  Hit any key to exit...'
             read -n1 a
             exit 0
         fi
-    else
-        exit 0
     fi
+    exit 0
 fi
 
-if [ "$1" = "--install-server" ]; then
+if [[ $1 = '--install-server' ]]; then
     clear
-    echo ""
-    echo "  INSTALL REMOTE DESKTOP SERVER"
-    echo "  -----------------------------"
-    echo "  This script will install Vino VNC server."
-    echo ""
-    echo -n "  Run the installer now? (Y|n) > "
+    echo
+    echo '  INSTALL REMOTE DESKTOP SERVER'
+    echo '  -----------------------------'
+    echo '  This script will install Vino VNC server.'
+    echo
+    echo -n '  Run the installer now? (Y|n) > '
     read a
-    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
-    [ "$a" = "" ]; then
+    if [[ ${a,} = 'y' || ! $a ]]; then
         
         connectiontest
         
         #update sources
-        echo "  Updating sources..."
+        echo '  Updating sources...'
 		sleep 2s
 		sudo apt-get update
 		clear
@@ -98,37 +94,35 @@ if [ "$1" = "--install-server" ]; then
         
         if ! sudo apt-get install -y vino; then
             clear
-            echo ""
-            echo "  There was a problem installing Vino VNC server."
-            echo ""
-            echo "  Hit any key to try again, or \"q\" to quit..."
+            echo
+            echo '  There was a problem installing Vino VNC server.'
+            echo
+            echo '  Hit any key to try again, or "q" to quit...'
             read -n1 a
-            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
+            if [[ ${a,} = "q" ]]; then
                 clear
-                exit 0
             else
                 cb-remote-desktop-pipemenu --install-server
-                exit 0
             fi
+            exit 0
         else
             clear
-            echo ""
-            echo "  Vino VNC server has been installed successfully."
-            echo ""
-            echo "  Hit any key to exit..."
+            echo
+            echo '  Vino VNC server has been installed successfully.'
+            echo
+            echo '  Hit any key to exit...'
             read -n1 a
             exit 0
         fi
-    else
-        exit 0
     fi
+    exit 0
 fi
 
 # Start pipemenu
-echo "    <openbox_pipe_menu>"
+echo '    <openbox_pipe_menu>'
 
 # Viewer
-if [ -x "/usr/bin/xtightvncviewer" ];then
+if [[ -x /usr/bin/xtightvncviewer ]];then
     cat << _menu_
 	    <item label="Viewer">
             <action name="Execute">
@@ -153,9 +147,8 @@ _menu_
 fi
 
 # Server
-if [ -x "/usr/lib/vino/vino-server" ];then
-
-	if [ "$(pidof vino-server)" ];then
+if [[ -x /usr/lib/vino/vino-server ]]; then
+	if pidof -s vino-server > /dev/null; then
 		cat << _menu_
 	    <item label="Stop VNC Server">
             <action name="Execute">
@@ -198,5 +191,5 @@ _menu_
 fi
 
 # End pipemenu
-echo "    </openbox_pipe_menu>"
+echo '    </openbox_pipe_menu>'
 exit 0

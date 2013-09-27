@@ -7,8 +7,7 @@
 
 pathto=$(readlink -f "$0" | sed 's%/*[^/]\+/*$%%')
 
-if [[ -f $pathto/cb-include.cfg ]]
-then
+if [[ -f $pathto/cb-include.cfg ]]; then # but what for?
     source "$pathto/cb-include.cfg"
 else
     echo "  Failed to locate cb-include.cfg"
@@ -16,20 +15,20 @@ else
 fi
 
 if [[ $1 = '--install' ]]; then
-    terminator --title="Install LibreOffice" --command="cb-libreoffice-pipemenu --install-lo"
+    terminator --title='Install LibreOffice' --command='cb-libreoffice-pipemenu --install-lo'
     exit 0
 fi
 
 if [[ $1 = '--install-lo' ]]; then
     clear
-    echo ""
+    echo
     echo "  INSTALL LIBREOFFICE"
     echo "  -------------------"
     echo "  This script will install LibreOffice."
-    echo ""
+    echo
     echo -n "  Run the installer now? (Y|n) > "
     read a
-    if [[ ${a,} = 'y' ]] || [[ "$a" = "" ]]; then
+    if [[ ${a,} = 'y' || ! $a ]]; then
         # Checking internet connection...
         connectiontest
         clear
@@ -62,7 +61,7 @@ fi
 echo "    <openbox_pipe_menu>"
 
 # Writer
-if [ -x "/usr/bin/lowriter" ];then
+if [[ -x /usr/bin/lowriter ]]; then
     INSTALLED=true
     cat << _lowriter_
 	    <item label="Writer">
@@ -76,7 +75,7 @@ _lowriter_
 fi
 
 # Calc
-if [ -x "/usr/bin/localc" ];then
+if [[ -x /usr/bin/localc ]]; then
     INSTALLED=true
     cat << _localc_
 	    <item label="Calc">
@@ -90,7 +89,7 @@ _localc_
 fi
 
 # Impress
-if [ -x "/usr/bin/loimpress" ];then
+if [[ -x /usr/bin/loimpress ]]; then
     INSTALLED=true
     cat << _loimpress_
 	    <item label="Impress">
@@ -104,7 +103,7 @@ _loimpress_
 fi
 
 # Draw
-if [ -x "/usr/bin/lodraw" ];then
+if [[ -x /usr/bin/lodraw ]]; then
     INSTALLED=true
     cat << _lodraw_
 	    <item label="Draw">
@@ -118,7 +117,7 @@ _lodraw_
 fi
 
 # Base
-if [ -x "/usr/bin/lobase" ];then
+if [[ -x /usr/bin/lobase ]]; then
     INSTALLED=true
     cat << _lobase_
 	    <item label="Base">
@@ -131,7 +130,7 @@ if [ -x "/usr/bin/lobase" ];then
 _lobase_
 fi
 
-if ! [[ $INSTALLED ]]; then
+if [[ ! $INSTALLED ]]; then
     cat << _loinstall_
 	    <item label="Install LibreOffice">
             <action name="Execute">
