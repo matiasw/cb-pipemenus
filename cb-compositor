@@ -13,12 +13,12 @@ else
 fi
 
 # Edit xcompmgr settings
-if [ "$1" = "--edit" ]; then
-    if [ ! -f /home/$USER/.config/compton.conf ]; then
-        cp /etc/xdg/compton.conf /home/$USER/.config/compton.conf
+if [[ $1 = '--edit' ]]; then
+    if [[ ! -f /home/$USER/.config/compton.conf ]]; then
+        cp '/etc/xdg/compton.conf' "/home/$USER/.config/compton.conf"
     fi
-    if [ -x "/usr/bin/geany" ]; then
-        geany /home/$USER/.config/compton.conf &
+    if [[ -x /usr/bin/geany ]]; then
+        geany "/home/$USER/.config/compton.conf" &
     else
         terminator --command="nano /home/$USER/.config/compton.conf"
     fi
@@ -26,8 +26,8 @@ if [ "$1" = "--edit" ]; then
 fi
 
 # Toggle compositing with compton. Called with "cb-compositor --toggle"
-if [ "$1" = "--toggle" ] || [ "$1" = "--start" ]; then 
-    if [ ! "$(pidof compton)" ]; then
+if [[ $1 = '--toggle' || $1 = '--start' ]]; then 
+    if ! pidof compton > /dev/null; then
       $EXECXCOMP &
     else
       killall compton
@@ -35,65 +35,59 @@ if [ "$1" = "--toggle" ] || [ "$1" = "--start" ]; then
     exit 0
 fi
 
-if [ "$1" = "--restart" ]; then
-    if [ "$(pidof compton)" ]; then
-        killall compton && sleep 1s
-        cb-compositor --start
-    fi
+if [[ $1 = '--restart' ]]; then
+    killall -q compton && sleep 1s
+    cb-compositor --start
     exit 0
 fi
-if [ "$1" = "--watch" ]; then
-    while inotifywait -e modify /home/$USER/.config/compton.conf; do
+
+if [[ $1 = '--watch' ]]; then
+    while inotifywait -e modify "/home/$USER/.config/compton.conf"; do
         cb-compositor --restart
     done
     exit 0
 fi
+
 # Output Openbox menu
-if [ ! "$(pidof compton)" ]; then
+echo '    <openbox_pipe_menu>'
+if ! pidof compton > /dev/null; then
     cat << _EOF_
-    <openbox_pipe_menu>
-	    <item label="Enable Compositing">
+        <item label="Enable Compositing">
             <action name="Execute">
-				<command>
-					cb-compositor --start
-				</command>
-			</action>
-		</item>
-		<item label="Edit Compositing Settings">
-            <action name="Execute">
-				<command>
-					cb-compositor --edit
-				</command>
-			</action>
-		</item>
-    </openbox_pipe_menu>
+                <command>
+                    cb-compositor --start
+                </command>
+            </action>
+        </item>
 _EOF_
 else
     cat << _EOF_
-    <openbox_pipe_menu>
-				<item label="Restart Compositing">
-					<action name="Execute">
-						<command>
-							cb-compositor --restart
-						</command>
-					</action>
-				</item>
-				<item label="Disable Compositing">
-					<action name="Execute">
-						<command>
-							cb-compositor --toggle
-						</command>
-					</action>
-				</item>
-                <separator/>
-                <item label="Edit Compositing Settings">
-                    <action name="Execute">
-                        <command>
-                            cb-compositor --edit
-                        </command>
-                    </action>
-                </item>
-    </openbox_pipe_menu>
+        <item label="Restart Compositing">
+            <action name="Execute">
+                <command>
+                    cb-compositor --restart
+                </command>
+            </action>
+        </item>
+        <item label="Disable Compositing">
+            <action name="Execute">
+                <command>
+                    cb-compositor --toggle
+                </command>
+            </action>
+        </item>
+        <separator/>
 _EOF_
 fi
+cat << _EOF_
+        <item label="Edit Compositing Settings">
+            <action name="Execute">
+                <command>
+                    cb-compositor --edit
+                </command>
+            </action>
+        </item>
+    </openbox_pipe_menu>
+_EOF_
+
 exit 0

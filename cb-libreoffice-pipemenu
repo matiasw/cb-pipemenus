@@ -15,14 +15,12 @@ else
     exit 1
 fi
 
-# Set flag
-INSTALLED=false
-
-if [ "$1" = "--install" ]; then
+if [[ $1 = '--install' ]]; then
     terminator --title="Install LibreOffice" --command="cb-libreoffice-pipemenu --install-lo"
     exit 0
 fi
-if [ "$1" = "--install-lo" ]; then
+
+if [[ $1 = '--install-lo' ]]; then
     clear
     echo ""
     echo "  INSTALL LIBREOFFICE"
@@ -31,8 +29,7 @@ if [ "$1" = "--install-lo" ]; then
     echo ""
     echo -n "  Run the installer now? (Y|n) > "
     read a
-    if [ "$a" = "y" ] || [ "$a" = "Y" ] || \
-    [ "$a" = "" ]; then
+    if [[ ${a,} = 'y' ]] || [[ "$a" = "" ]]; then
         # Checking internet connection...
         connectiontest
         clear
@@ -40,32 +37,26 @@ if [ "$1" = "--install-lo" ]; then
         sleep 2s
         sudo apt-get update
         clear
-        if ! sudo apt-get install -y cb-meta-libreoffice; then
+        while ! sudo apt-get install -y cb-meta-libreoffice; do
             clear
             echo ""
             echo "  There was a problem installing LibreOffice."
             echo ""
             echo "  Hit any key to try again, or \"q\" to quit..."
             read -n1 a
-            if [ "$a" = "q" ] || [ "$a" = "Q" ]; then
+            if [[ ${a,} = 'q' ]]; then
                 clear
                 exit 0
-            else
-                cb-libreoffice-pipemenu --install-oo
-                exit 0
             fi
-        else
-            clear
-            echo ""
-            echo "  LibreOffice has been installed successfully."
-            echo ""
-            echo "  Hit any key to exit..."
-            read -n1 a
-            exit 0
-        fi
-    else
-        exit 0
+        done
+        clear
+        echo ""
+        echo "  LibreOffice has been installed successfully."
+        echo ""
+        echo "  Hit any key to exit..."
+        read -n1
     fi
+    exit 0
 fi
 # Start pipemenu
 echo "    <openbox_pipe_menu>"
@@ -140,7 +131,7 @@ if [ -x "/usr/bin/lobase" ];then
 _lobase_
 fi
 
-if [ $INSTALLED = false ]; then
+if ! [[ $INSTALLED ]]; then
     cat << _loinstall_
 	    <item label="Install LibreOffice">
             <action name="Execute">
