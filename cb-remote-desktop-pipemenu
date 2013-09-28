@@ -119,77 +119,27 @@ if [[ $1 = '--install-server' ]]; then
 fi
 
 # Start pipemenu
-echo '    <openbox_pipe_menu>'
+menuStart
 
 # Viewer
 if [[ -x /usr/bin/xtightvncviewer ]];then
-    cat << _menu_
-	    <item label="Viewer">
-            <action name="Execute">
-				<command>
-					vncviewer
-				</command>
-			</action>
-		</item>
-		<separator/>
-_menu_
+    menuItem 'Viewer' 'vncviewer'
 else
-    cat << _menu_
-	    <item label="Install Viewer">
-            <action name="Execute">
-				<command>
-					cb-remote-desktop-pipemenu --viewer
-				</command>
-			</action>
-		</item>
-		<separator/>
-_menu_
+    menuItem 'Install Viewer' 'cb-remote-desktop-pipemenu --viewer'
 fi
+
+menuSeparator
 
 # Server
 if [[ -x /usr/lib/vino/vino-server ]]; then
 	if pidof -s vino-server > /dev/null; then
-		cat << _menu_
-	    <item label="Stop VNC Server">
-            <action name="Execute">
-				<command>
-					killall vino-server
-				</command>
-			</action>
-		</item>
-_menu_
+        menuItem 'Stop VNC Server' 'killall vino-server'
 	else
-		cat << _menu_
-	    <item label="Start VNC Server">
-            <action name="Execute">
-				<command>
-					/usr/lib/vino/vino-server
-				</command>
-			</action>
-		</item>
-_menu_
+        menuItem 'Start VNC Server' '/usr/lib/vino/vino-server'
 	fi
-		cat << _menu_
-	    <item label="VNC Server Preferences">
-            <action name="Execute">
-				<command>
-					vino-preferences
-				</command>
-			</action>
-		</item>
-_menu_
+    menuItem 'VNC Server Preferences' 'vino-preferences'
 else
-	cat << _menu_
-	    <item label="Install VNC Server">
-            <action name="Execute">
-				<command>
-					cb-remote-desktop-pipemenu --server
-				</command>
-			</action>
-		</item>
-_menu_
+    menuItem 'Install VNC Server' 'cb-remote-desktop-pipemenu --server'
 fi
-
-# End pipemenu
-echo '    </openbox_pipe_menu>'
+menuEnd
 exit 0

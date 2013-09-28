@@ -10,7 +10,7 @@ pathto=$(readlink -f "$0" | sed 's%/*[^/]\+/*$%%')
 if [[ -f $pathto/cb-include.cfg ]]; then # but what for?
     source "$pathto/cb-include.cfg"
 else
-    echo "  Failed to locate cb-include.cfg"
+    echo '  Failed to locate cb-include.cfg'
     exit 1
 fi
 
@@ -22,126 +22,74 @@ fi
 if [[ $1 = '--install-lo' ]]; then
     clear
     echo
-    echo "  INSTALL LIBREOFFICE"
-    echo "  -------------------"
-    echo "  This script will install LibreOffice."
+    echo '  INSTALL LIBREOFFICE'
+    echo '  -------------------'
+    echo '  This script will install LibreOffice.'
     echo
-    echo -n "  Run the installer now? (Y|n) > "
-    read a
-    if [[ ${a,} = 'y' || ! $a ]]; then
+    if prompt '  Run the installer now?'; then
         # Checking internet connection...
         connectiontest
         clear
-        echo "  Updating sources..."
+        echo '  Updating sources...'
         sleep 2s
         sudo apt-get update
         clear
         while ! sudo apt-get install -y cb-meta-libreoffice; do
             clear
-            echo ""
-            echo "  There was a problem installing LibreOffice."
-            echo ""
-            echo "  Hit any key to try again, or \"q\" to quit..."
-            read -n1 a
-            if [[ ${a,} = 'q' ]]; then
+            echo
+            echo '  There was a problem installing LibreOffice.'
+            echo
+            if prompt '  Hit any key to try again, or "q" to quit...' Q; then
                 clear
                 exit 0
             fi
         done
         clear
-        echo ""
-        echo "  LibreOffice has been installed successfully."
-        echo ""
-        echo "  Hit any key to exit..."
+        echo
+        echo '  LibreOffice has been installed successfully.'
+        echo
+        echo '  Hit any key to exit...'
         read -n1
     fi
     exit 0
 fi
 # Start pipemenu
-echo "    <openbox_pipe_menu>"
+menuStart
 
 # Writer
 if [[ -x /usr/bin/lowriter ]]; then
     INSTALLED=true
-    cat << _lowriter_
-	    <item label="Writer">
-            <action name="Execute">
-				<command>
-					lowriter
-				</command>
-			</action>
-		</item>
-_lowriter_
+    menuItem 'Writer' 'lowriter'
 fi
 
 # Calc
 if [[ -x /usr/bin/localc ]]; then
     INSTALLED=true
-    cat << _localc_
-	    <item label="Calc">
-            <action name="Execute">
-				<command>
-					localc
-				</command>
-			</action>
-		</item>
-_localc_
+    menuItem 'Calc' 'localc'
 fi
 
 # Impress
 if [[ -x /usr/bin/loimpress ]]; then
     INSTALLED=true
-    cat << _loimpress_
-	    <item label="Impress">
-            <action name="Execute">
-				<command>
-					loimpress
-				</command>
-			</action>
-		</item>
-_loimpress_
+    menuItem 'Impress' 'loimpress'
 fi
 
 # Draw
 if [[ -x /usr/bin/lodraw ]]; then
     INSTALLED=true
-    cat << _lodraw_
-	    <item label="Draw">
-            <action name="Execute">
-				<command>
-					lodraw
-				</command>
-			</action>
-		</item>
-_lodraw_
+    menuItem 'Draw' 'lodraw'
 fi
 
 # Base
 if [[ -x /usr/bin/lobase ]]; then
     INSTALLED=true
-    cat << _lobase_
-	    <item label="Base">
-            <action name="Execute">
-				<command>
-					lobase
-				</command>
-			</action>
-		</item>
-_lobase_
+    menuItem 'Base' 'lobase'
 fi
 
 if [[ ! $INSTALLED ]]; then
-    cat << _loinstall_
-	    <item label="Install LibreOffice">
-            <action name="Execute">
-				<command>
-					cb-libreoffice-pipemenu --install
-				</command>
-			</action>
-		</item>
-_loinstall_
+    menuItem 'Install LibreOffice' 'cb-libreoffice-pipemenu --install'
 fi
 
 # End pipemenu
-echo "    </openbox_pipe_menu>"
+menuEnd
 exit 0

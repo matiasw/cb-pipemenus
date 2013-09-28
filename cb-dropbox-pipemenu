@@ -39,7 +39,6 @@ if [[ $1 = '--install-dropbox' ]]; then
         ;;
     esac
     
-    
     curl -s -I "$DROPBOXURL" > "$TMPFILE"
 	if [[ $? = 0 ]]; then
 		
@@ -106,84 +105,23 @@ fi
 # pipemenu stuff
 # --------------------------------------------------------------------
 # Check if user has installed Dropbox and offer to install it if not
+menuStart
 if [[ ! -d $USERDBDIR ]]; then
-    cat << _dropboxnotinstalledmenu_
-    <openbox_pipe_menu>
-	    <item label="Install Dropbox">
-            <action name="Execute">
-				<command>
-					cb-dropbox-pipemenu --install-dropbox
-				</command>
-			</action>
-		</item>
-		<separator/>
-		<item label="Find out more about Dropbox">
-            <action name="Execute">
-				<command>
-					x-www-browser http://db.tt/5mJg9lb
-				</command>
-			</action>
-		</item>
-		<item label="Dropbox Terms">
-            <action name="Execute">
-				<command>
-					x-www-browser https://www.dropbox.com/terms
-				</command>
-			</action>
-		</item>
-    </openbox_pipe_menu>
-_dropboxnotinstalledmenu_
+    menuItem 'Install Dropbox' 'cb-dropbox-pipemenu --install-dropbox'
+    menuSeparator
+    menuItem 'Find out more about Dropbox' 'x-www-browser http://db.tt/5mJg9lb'
 else
-    echo "<openbox_pipe_menu>"
     if [[ -d /home/$USER/Dropbox ]]; then
-        cat << _dropboxhomedirlink_
-        <item label="Open Dropbox Folder">
-            <action name="Execute">
-				<command>
-					thunar /home/$USER/Dropbox
-				</command>
-			</action>
-		</item>
-_dropboxhomedirlink_
+        menuItem 'Open Dropbox Folder' 'thunar /home/$USER/Dropbox'
     fi
     if ! pidof dropbox > /dev/null; then
-        cat << _startdropbox_
-        <item label="Start Dropbox">
-            <action name="Execute">
-				<command>
-					cb-dropbox-pipemenu --start-dropbox
-				</command>
-			</action>
-		</item>
-_startdropbox_
+        menuItem 'Start Dropbox' 'cb-dropbox-pipemenu --start-dropbox'
     else
-        cat << _stopdropbox_
-        <item label="Stop Dropbox">
-            <action name="Execute">
-				<command>
-					cb-dropbox-pipemenu --stop-dropbox
-				</command>
-			</action>
-		</item>
-_stopdropbox_
+        menuItem 'Stop Dropbox' 'cb-dropbox-pipemenu --stop-dropbox'
     fi
-    cat << _dropboxinfomenu_
-    <separator/>
-		<item label="Launch Dropbox Website">
-            <action name="Execute">
-				<command>
-					x-www-browser https://www.dropbox.com/home
-				</command>
-			</action>
-		</item>
-		<item label="Dropbox Terms">
-            <action name="Execute">
-				<command>
-					x-www-browser https://www.dropbox.com/terms
-				</command>
-			</action>
-		</item>
-    </openbox_pipe_menu>
-_dropboxinfomenu_
+    menuSeparator
+    menuItem 'Launch Dropbox Website' 'x-www-browser https://www.dropbox.com/home'
 fi
+menuItem 'Dropbox Terms' 'x-www-browser https://www.dropbox.com/terms'
+menuEnd
 exit 0
