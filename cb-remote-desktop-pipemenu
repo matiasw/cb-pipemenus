@@ -31,9 +31,9 @@ if [[ $1 = '--install-viewer' ]]; then
         
         #update sources
         echo '  Updating sources...'
-		sleep 2s
-		sudo apt-get update
-		clear
+        sleep 2s
+        sudo apt-get update
+        clear
         
         if ! sudo apt-get install -y xtightvncviewer; then
             clear
@@ -69,9 +69,9 @@ if [[ $1 = '--install-server' ]]; then
         
         #update sources
         echo '  Updating sources...'
-		sleep 2s
-		sudo apt-get update
-		clear
+        sleep 2s
+        sudo apt-get update
+        clear
         
         if ! sudo apt-get install -y vino; then
             clear
@@ -109,11 +109,11 @@ menuSeparator
 
 # Server
 if [[ -x /usr/lib/vino/vino-server ]]; then
-	if pidof -s vino-server > /dev/null; then
+    if pidof -s vino-server > /dev/null; then
         menuItem 'Stop VNC Server' 'killall vino-server'
-	else
+    else
         menuItem 'Start VNC Server' '/usr/lib/vino/vino-server'
-	fi
+    fi
     menuItem 'VNC Server Preferences' 'vino-preferences'
 else
     menuItem 'Install VNC Server' 'cb-remote-desktop-pipemenu --server'

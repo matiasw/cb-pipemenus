@@ -4,224 +4,112 @@
 # by Philip Newborough (aka corenominal) <corenominal@corenominal.org>
 # ---------------------------------------------------------------------
 
-if ! . cb-include.cfg &> /dev/null; then
+# In order to add another browser, simply add it to this array:
+TOOLS=('chromium-browser' 'iceweasel' 'google-chrome' 'opera')
+# If the package needs additional configuration before installation simply create a function called setupXxxxXxxx
+
+KEY_URLS_GOOGLE=('https://dl-ssl.google.com/linux/linux_signing_key.pub' 'http://packages.crunchbang.org/waldorf-files/apt-keys/google-chrome.key')
+KEY_URLS_OPERA=('http://deb.opera.com/archive.key' 'http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key')
+
+if ! . cb-include.cfg 2> /dev/null; then
     echo '  Failed to locate cb-include.cfg in PATH' >&2
     exit 1
 fi
 
-google_key_url_1='https://dl-ssl.google.com/linux/linux_signing_key.pub'
-google_key_url_2='http://packages.crunchbang.org/waldorf-files/apt-keys/google-chrome.key'
-opera_key_url_1='http://deb.opera.com/archive.key'
-opera_key_url_2='http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key'
 
-if [[ $1 =~ ^--(chromium-browser|iceweasel|google-chrome|opera)$ ]]; then
+if [[ $1 !=~ --install-* ]]; then
     browserName=${1:2}
     browserName=${browserName//-/ }
-    terminator --title="Install ${browserName~}" --command="cb-x-www-browser-pipemenu --install${1:1}"
+    terminator --title="Install ${browserName~}" --command="cb-x-www-browser-pipemenu --install-${1:2}"
     exit 0
 fi
 
-if [[ $1 = '--install-chromium-browser'  ]]; then
+
+addAptKey() {
+    clear
+    echo '  Adding APT key...'
+    sleep 1
+    for curArg; do
+        wget -O apt.key "$curKey" 2> /dev/null && break; # success. No need to try other keys
+    done
+    if [[ &? != 0 ]]; then
+        echo '  Failed to retrieve APT key' >&2
+        exit 1
+    fi
+    sudo apt-key add apt.key
+    rm -f apt.key
+}
+
+setupGoogleChrome() {
+    addAptKey "${KEY_URLS_GOOGLE[@]}"
+    echo '  Creating APT sources file...'
+    echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee '/etc/apt/sources.list.d/google-chrome.list'
+}
+
+setupOpera() {
+    addAptKey "${KEY_URLS_OPERA[@]}"
+    echo '  Creating APT sources file...'
+    echo 'deb http://deb.opera.com/opera/ stable non-free' | sudo tee /etc/apt/sources.list.d/opera.list
+}
+
+if [[ $1 = --install-* ]]; then
+    packageName=${1#--install-}
+    browserName=${packageName//-/ }
+    browserName=${browserName~}
+    browserNameUpper=${browserName^^}
+    
+    for curTool in "${tools[@]}"; do # if $packageName exists in tools array
+        [[ $curTool = "$packageName" ]] && break
+    done
+    if [[ $? != 0 ]]; then
+        echo "  Unable to install $browserName. There is no such browser that I know of." >&2
+        exit 1
+    fi
+    
     clear
     echo
-    echo '  INSTALL CHROMIUM BROWSER'
+    echo "  INSTALL ${browserNameUpper% BROWSER} BROWSER"
     echo '  ------------------------'
-    echo '  This script will install Chromium.'
-    echo
-    if prompt '  Run the installer now?'; then
-        connectiontest
-        clear
-        echo '  Updating sources...'
-		sleep 2s
-		sudo apt-get update
-		clear
-        
-        if ! sudo apt-get install -y chromium-browser; then
-            clear
-            echo
-            echo '  There was a problem installing Chromium.'
-            echo
-            if prompt '  Hit any key to try again, or "q" to quit...' Q; then
-                clear
-            else
-                cb-x-www-browser-pipemenu --install-chromium-browser
-            fi
-        else
-            clear
-            echo
-            echo '  Chromium has been installed successfully.'
-            echo
-            echo '  Hit any key to exit...'
-            read -n1 a
-        fi
-    fi
-    exit 0
-fi
-
-if [[ $1 = '--install-iceweasel' ]]; then
-    clear
-    echo
-    echo '  INSTALL ICEWEASEL BROWSER'
-    echo '  -------------------------'
-    echo '  This script will install Iceweasel.'
-    echo
-    prompt '  Run the installer now?'
-        connectiontest
-        clear
-        echo '  Updating sources...'
-		sleep 2s
-		sudo apt-get update
-		clear
-        
-        if ! sudo apt-get install -y iceweasel; then
-            clear
-            echo
-            echo '  There was a problem installing Iceweasel.'
-            echo
-            if prompt '  Hit any key to try again, or "q" to quit...' Q
-                clear
-            else
-                cb-x-www-browser-pipemenu --install-iceweasel
-            fi
-        else
-            clear
-            echo
-            echo '  Iceweasel has been installed successfully.'
-            echo
-            echo '  Hit any key to exit...'
-            read -n1 a
-        fi
-    fi
-    exit 0
-fi
-
-if [[ $1 = '--install-google-chrome' ]]; then
-    clear
-    echo
-    echo '  INSTALL GOOGLE CHROME WWW BROWSER'
-    echo '  ---------------------------------'
-    echo '  This script will install Google Chrome.'
+    echo "  This script will install $browserName."
     echo
     if prompt '  Run the installer now?'; then
         connectiontest
         
-        #add apt-key
+        setupFunctionName="setup${browserName//[^a-zA-Z]/}" # setupFunctionName should now be in format like 'setupChromiumBrowser'
+        [[ $(type -t "$setupFunctionName") == 'function' ]] && "$setupFunctionName" # run setup function if it exists
+        
         clear
-        echo '  Adding APT key...'
-        sleep 2s
-        if ! wget -O google.key "$google_key_url_1" 2> /dev/null; then
-            # Fallback to packages.crunchbang.org.
-            if ! wget -O google.key "$google_key_url_2" 2> /dev/null; then
-                echo '  Failed to retrieve APT key from Google Inc.'
-                clear
-                exit 1
-            fi
-        fi
-        sudo apt-key add google.key
-        rm -f google.key
-        
-        #create sources file
-        echo '  Creating APT sources file...'
-        sleep 2s
-        if [[ -f /etc/apt/sources.list.d/google-chrome.list ]]; then
-            sudo rm -f '/etc/apt/sources.list.d/google-chrome.list'
-        fi
-        echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee -a '/etc/apt/sources.list.d/google-chrome.list'
-        
-        #update sources
         echo '  Updating sources...'
-		sleep 2s
-		sudo apt-get update
-		clear
-        
-        if ! sudo apt-get install -y google-chrome-stable; then
+        sleep 1
+        sudo apt-get update
+        clear
+        if ! sudo apt-get install -y "$packageName"; then
             clear
             echo
-            echo '  There was a problem installing Google Chrome.'
+            echo "  There was a problem installing $browserName."
             echo
             if prompt '  Hit any key to try again, or "q" to quit...' Q; then
                 clear
             else
-                cb-x-www-browser-pipemenu --install-google-chrome
+                cb-x-www-browser-pipemenu "$1"
             fi
         else
             clear
             echo
-            echo '  Google Chrome has been installed successfully.'
+            echo "  $browserName has been installed successfully."
             echo
             echo '  Hit any key to exit...'
-            read -n1 a
+            read -srn1
         fi
     fi
     exit 0
 fi
 
-if [[ $1 = '--install-opera' ]]; then
-    clear
-    echo
-    echo '  INSTALL OPERA WWW BROWSER'
-    echo '  -------------------------'
-    echo '  This script will install Opera.'
-    echo
-    if prompt '  Run the installer now?'; then        
-        connectiontest
-        
-        #add apt-key
-        clear
-        echo '  Adding APT key...'
-        sleep 2s
-        if ! wget -O opera.key "$opera_key_url_1" 2> /dev/null; then
-            # Fallback to packages.crunchbang.org.
-            if ! wget -O opera.key "$opera_key_url_2" 2> /dev/null; then
-                echo '  Failed to retrieve APT key from Opera Software ASA.'
-                clear
-                exit 1
-            fi
-        fi
-        sudo apt-key add opera.key
-        rm -f opera.key
-        
-        #create sources file
-        echo '  Creating APT sources file...'
-        sleep 2s
-        if [[ -f /etc/apt/sources.list.d/opera.list ]]; then
-            sudo rm -f '/etc/apt/sources.list.d/opera.list'
-        fi
-        echo 'deb http://deb.opera.com/opera/ stable non-free' | sudo tee -a /etc/apt/sources.list.d/opera.list
-        #update sources
-        echo '  Updating sources...'
-		sleep 2s
-		sudo apt-get update
-		clear
-        
-        if ! sudo apt-get install -y opera; then
-            clear
-            echo
-            echo '  There was a problem installing Opera.'
-            echo
-            if prompt '  Hit any key to try again, or "q" to quit...' Q; then
-                clear
-            else
-                cb-x-www-browser-pipemenu --install-opera
-            fi
-        else
-            clear
-            echo
-            echo '  Opera has been installed successfully.'
-            echo
-            echo '  Hit any key to exit...'
-            read -n1 a
-        fi
-    fi
-    exit 0
-fi
 
 # Start pipemenu
 menuStart
 
-tools=( 'chromium-browser' 'iceweasel' 'google-chrome' 'opera' )
-
-for curTool in "${tools[@]}"; do
+for curTool in "${TOOLS[@]}"; do
     curToolName=${curTool//-/ }
     curToolName=${curToolName~}
     if [[ -x /usr/bin/$curTool ]]; then

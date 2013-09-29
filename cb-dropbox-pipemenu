@@ -47,22 +47,22 @@ if [[ $1 = '--install-dropbox' ]]; then
     esac
     
     curl -s -I "$DROPBOXURL" > "$TMPFILE"
-	if [[ $? = 0 ]]; then
-		read _ RESPONSE _ <<< $(head -n 1 "$TMPFILE")
-		
-		#if [ $RESPONSE -ne "200" ]; then
-		if [[ RESPONSE != 302 ]]; then
-			zenity --warning --title='Dropbox Installation' --text 'Error, failed to contact server. Please try again later.'
-			exit 1
-		else
-			wget "$DROPBOXURL" -O ~/dropbox.tar.gz 2>&1 | \
+    if [[ $? = 0 ]]; then
+        read _ RESPONSE _ <<< $(head -n 1 "$TMPFILE")
+        
+        #if [ $RESPONSE -ne "200" ]; then
+        if [[ RESPONSE != 302 ]]; then
+            zenity --warning --title='Dropbox Installation' --text 'Error, failed to contact server. Please try again later.'
+            exit 1
+        else
+            wget "$DROPBOXURL" -O ~/dropbox.tar.gz 2>&1 | \
              sed -u 's/^.* \+\([0-9]\+%\) \+\([0-9.]\+[GMKB]\) \+\([0-9hms.]\+\).*$/\1\n# Downloading... \2 (\3)/' | \
              zenity --progress --title='Installing Dropbox' --auto-kill --auto-close
-		fi
-	else
+        fi
+    else
         zenity --warning --title='Dropbox Installation' --text 'Error, failed to contact server. Please try again later.'
-		exit 1
-	fi
+        exit 1
+    fi
 
     #extract binary
     tar -xf 'dropbox.tar.gz'
