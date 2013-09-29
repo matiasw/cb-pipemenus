@@ -1,12 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 # --------------------------------------------------------------------
 # An Openbox pipemenu for use with Dropbox and CrunchBang Linux.
 # Written for CrunchBang Linux <http://crunchbanglinux.org/>
 # by Philip Newborough (aka corenominal) <mail@philipnewborough.co.uk>
 # --------------------------------------------------------------------
+
+if ! . cb-include.cfg &> /dev/null; then
+    echo '  Failed to locate cb-include.cfg in PATH' >&2
+    exit 1
+fi
+
 # Set some variables
-USERDBDIR="/home/${USER}/.dropbox-dist"
-TMPFILE="/tmp/${USERNAME}_cbdropbox"
+USERDBDIR=~/.dropbox-dist/
+TMPFILE="/tmp/${USER}_cbdropbox/"
+
 # --------------------------------------------------------------------
 # manipulation
 # --------------------------------------------------------------------
@@ -24,54 +31,43 @@ fi
 if [[ $1 = '--install-dropbox' ]]; then
     zenity --question --title='Dropbox Installation' --text 'This script will install Dropbox.\nDo you want to proceed?' || exit 0
 
-    cd "/home/$USER"
+    cd ~
     
     platform=$(uname -m)
     platform=${platform,,}
     case $platform in
     "x86_64")
-        #DROPBOXURL="http://packages.crunchbang.org/waldorf-files/dropbox/64/dropbox.tar.gz"
-        DROPBOXURL="http://www.dropbox.com/download?plat=lnx.x86_64"
+        #DROPBOXURL='http://packages.crunchbang.org/waldorf-files/dropbox/64/dropbox.tar.gz'
+        DROPBOXURL='http://www.dropbox.com/download?plat=lnx.x86_64'
         ;;
     *)
-        #DROPBOXURL="http://packages.crunchbang.org/waldorf-files/dropbox/32/dropbox.tar.gz"
-        DROPBOXURL="http://www.dropbox.com/download?plat=lnx.x86"
+        #DROPBOXURL='http://packages.crunchbang.org/waldorf-files/dropbox/32/dropbox.tar.gz'
+        DROPBOXURL='http://www.dropbox.com/download?plat=lnx.x86'
         ;;
     esac
     
     curl -s -I "$DROPBOXURL" > "$TMPFILE"
 	if [[ $? = 0 ]]; then
-		
-		RESPONSE=$(head -n 1 $TMPFILE | awk '{ print $2 }')
+		read _ RESPONSE _ <<< $(head -n 1 "$TMPFILE")
 		
 		#if [ $RESPONSE -ne "200" ]; then
 		if [[ RESPONSE != 302 ]]; then
 			zenity --warning --title='Dropbox Installation' --text 'Error, failed to contact server. Please try again later.'
 			exit 1
 		else
-			wget "$DROPBOXURL" 2>&1 | \
+			wget "$DROPBOXURL" -O ~/dropbox.tar.gz 2>&1 | \
              sed -u 's/^.* \+\([0-9]\+%\) \+\([0-9.]\+[GMKB]\) \+\([0-9hms.]\+\).*$/\1\n# Downloading... \2 (\3)/' | \
              zenity --progress --title='Installing Dropbox' --auto-kill --auto-close
 		fi
-
 	else
         zenity --warning --title='Dropbox Installation' --text 'Error, failed to contact server. Please try again later.'
 		exit 1
 	fi
-	
-	#rename binary
-	if [[ -f /home/$USER/download?plat=lnx.x86_64 ]]; then
-		mv /home/$USER/download?plat=lnx.x86_64 /home/$USER/dropbox.tar.gz
-	fi
-	if [[ -f /home/$USER/download?plat=lnx.x86 ]]; then
-		mv /home/$USER/download?plat=lnx.x86 /home/$USER/dropbox.tar.gz
-	fi
-    sleep 1s
 
     #extract binary
-    tar -xf dropbox.tar.gz
+    tar -xf 'dropbox.tar.gz'
     #delete binary
-    rm dropbox.tar.gz
+    rm 'dropbox.tar.gz'
     
     #quick sanity check
     if [[ ! -x $USERDBDIR/dropboxd ]]; then
@@ -81,19 +77,19 @@ if [[ $1 = '--install-dropbox' ]]; then
     zenity --info --title='Dropbox Installation' --text "Dropbox has been installed to:\n$USERDBDIR"
     zenity --question --title='Dropbox Installation' --text 'Dropbox can be started automatically when you start your session. Would you like to autostart Dropbox when you login?'
     if [[ $? != 1 ]]; then
-        ans=$(zenity  --title="Dropbox Installation" --list  --text "It is a good idea to add a delay before autostarting Dropbox\nso that your system can establish a working network connection.\n\nSelect the number of seconds to delay Dropbox autostarting.\nClick \"Cancel\" if you do not want to add a delay." \
-        --radiolist  --column "Pick" --column "Seconds:" FALSE 10 FALSE 20 FALSE 30 FALSE 40 FALSE 50 TRUE 60);
+        ans=$(zenity  --title='Dropbox Installation' --list  --text 'It is a good idea to add a delay before autostarting Dropbox\nso that your system can establish a working network connection.\n\nSelect the number of seconds to delay Dropbox autostarting.\nClick "Cancel" if you do not want to add a delay.' \
+        --radiolist  --column 'Pick' --column 'Seconds:' FALSE 10 FALSE 20 FALSE 30 FALSE 40 FALSE 50 TRUE 60)
         if [[ $ans ]]; then
             echo "$ans"
-            echo "" >> "/home/$USER/.config/openbox/autostart"
-            echo "# Autostart the Dropbox deamon" >> "/home/$USER/.config/openbox/autostart"
-            echo "(sleep ${ans}s && ~/.dropbox-dist/dropboxd) &" >> "/home/$USER/.config/openbox/autostart"
-            echo "" >> "/home/$USER/.config/openbox/autostart"
+            echo >> ~/.config/openbox/autostart
+            echo '# Autostart the Dropbox deamon' >> ~/.config/openbox/autostart
+            echo "(sleep ${ans}s && ~/.dropbox-dist/dropboxd) &" >> ~/.config/openbox/autostart
+            echo >> ~/.config/openbox/autostart
         else
-            echo "" >> "/home/$USER/.config/openbox/autostart"
-            echo "# Autostart the Dropbox deamon" >> "/home/$USER/.config/openbox/autostart"
-            echo "~/.dropbox-dist/dropboxd &" >> "/home/$USER/.config/openbox/autostart"
-            echo "" >> "/home/$USER/.config/openbox/autostart"
+            echo >> ~/.config/openbox/autostart
+            echo '# Autostart the Dropbox deamon' >> ~/.config/openbox/autostart
+            echo '~/.dropbox-dist/dropboxd &' >> ~/.config/openbox/autostart
+            echo >> ~/.config/openbox/autostart
         fi
     fi
     zenity --question --title='Dropbox Installation' --text 'Do you wish to start the Dropbox client now?' || exit 0
@@ -111,8 +107,8 @@ if [[ ! -d $USERDBDIR ]]; then
     menuSeparator
     menuItem 'Find out more about Dropbox' 'x-www-browser http://db.tt/5mJg9lb'
 else
-    if [[ -d /home/$USER/Dropbox ]]; then
-        menuItem 'Open Dropbox Folder' 'thunar /home/$USER/Dropbox'
+    if [[ -d ~/Dropbox ]]; then
+        menuItem 'Open Dropbox Folder' 'thunar $HOME/Dropbox'
     fi
     if ! pidof dropbox > /dev/null; then
         menuItem 'Start Dropbox' 'cb-dropbox-pipemenu --start-dropbox'

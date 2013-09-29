@@ -4,17 +4,10 @@
 # by Philip Newborough (aka corenominal) <corenominal@corenominal.org>
 # ---------------------------------------------------------------------
 
-pathto=$(readlink -f "$0" | sed 's%/*[^/]\+/*$%%')
-
-if [[ -f $pathto/cb-include.cfg ]]
-then
-    source "$pathto/cb-include.cfg"
-else
-    echo '  Failed to locate cb-include.cfg'
+if ! . cb-include.cfg &> /dev/null; then
+    echo '  Failed to locate cb-include.cfg in PATH' >&2
     exit 1
 fi
-
-I=0
 
 if [[ $1 = '--viewer' ]]; then
     terminator --title='Install VNC Viewer' --command='cb-remote-desktop-pipemenu --install-viewer'
@@ -33,10 +26,7 @@ if [[ $1 = '--install-viewer' ]]; then
     echo '  -----------------------------'
     echo '  This script will install TightVNC Viewer.'
     echo
-    echo -n '  Run the installer now? (Y|n) > '
-    read a
-    if [[ ${a,} = "y" || ! $a ]]; then
-        
+    if prompt '  Run the installer now?'; then
         connectiontest
         
         #update sources
@@ -45,20 +35,16 @@ if [[ $1 = '--install-viewer' ]]; then
 		sudo apt-get update
 		clear
         
-        
         if ! sudo apt-get install -y xtightvncviewer; then
             clear
             echo
             echo '  There was a problem installing TightVNC viewer.'
             echo
-            echo '  Hit any key to try again, or "q" to quit...'
-            read -n1 a
-            if [[ ${a,} = 'q' ]]; then
+            if prompt '  Hit any key to try again, or "q" to quit...' Q; then
                 clear
             else
                 cb-remote-desktop-pipemenu --install-viewer
             fi
-            exit 0
         else
             clear
             echo
@@ -66,7 +52,6 @@ if [[ $1 = '--install-viewer' ]]; then
             echo
             echo '  Hit any key to exit...'
             read -n1 a
-            exit 0
         fi
     fi
     exit 0
@@ -79,10 +64,7 @@ if [[ $1 = '--install-server' ]]; then
     echo '  -----------------------------'
     echo '  This script will install Vino VNC server.'
     echo
-    echo -n '  Run the installer now? (Y|n) > '
-    read a
-    if [[ ${a,} = 'y' || ! $a ]]; then
-        
+    if prompt '  Run the installer now?'; then
         connectiontest
         
         #update sources
@@ -91,20 +73,16 @@ if [[ $1 = '--install-server' ]]; then
 		sudo apt-get update
 		clear
         
-        
         if ! sudo apt-get install -y vino; then
             clear
             echo
             echo '  There was a problem installing Vino VNC server.'
             echo
-            echo '  Hit any key to try again, or "q" to quit...'
-            read -n1 a
-            if [[ ${a,} = "q" ]]; then
+            if prompt '  Hit any key to try again, or "q" to quit...' Q; then
                 clear
             else
                 cb-remote-desktop-pipemenu --install-server
             fi
-            exit 0
         else
             clear
             echo
@@ -112,7 +90,6 @@ if [[ $1 = '--install-server' ]]; then
             echo
             echo '  Hit any key to exit...'
             read -n1 a
-            exit 0
         fi
     fi
     exit 0
@@ -122,7 +99,7 @@ fi
 menuStart
 
 # Viewer
-if [[ -x /usr/bin/xtightvncviewer ]];then
+if [[ -x /usr/bin/xtightvncviewer ]]; then
     menuItem 'Viewer' 'vncviewer'
 else
     menuItem 'Install Viewer' 'cb-remote-desktop-pipemenu --viewer'
@@ -141,5 +118,7 @@ if [[ -x /usr/lib/vino/vino-server ]]; then
 else
     menuItem 'Install VNC Server' 'cb-remote-desktop-pipemenu --server'
 fi
+
 menuEnd
+
 exit 0

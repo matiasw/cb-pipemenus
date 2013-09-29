@@ -4,6 +4,10 @@
 # Written for CrunchBang Linux <http://crunchbang.org/>
 # by Philip Newborough <corenominal@corenominal.org>
 
+if ! . cb-include.cfg &> /dev/null; then
+    echo '  Failed to locate cb-include.cfg in PATH' >&2
+    exit 1
+fi
 
 # ------------- Set xcompmgr command options -----------------------------------
 if glxinfo | egrep -iq 'direct rendering: yes'; then
@@ -14,13 +18,13 @@ fi
 
 # Edit xcompmgr settings
 if [[ $1 = '--edit' ]]; then
-    if [[ ! -f /home/$USER/.config/compton.conf ]]; then
-        cp '/etc/xdg/compton.conf' "/home/$USER/.config/compton.conf"
+    if [[ ! -f ~/.config/compton.conf ]]; then
+        cp '/etc/xdg/compton.conf' ~/.config/compton.conf
     fi
     if [[ -x /usr/bin/geany ]]; then
-        geany "/home/$USER/.config/compton.conf" &
+        geany ~/.config/compton.conf &
     else
-        terminator --command="nano /home/$USER/.config/compton.conf"
+        terminator --command='nano ~/.config/compton.conf'
     fi
     exit 0
 fi
@@ -28,9 +32,9 @@ fi
 # Toggle compositing with compton. Called with "cb-compositor --toggle"
 if [[ $1 = '--toggle' || $1 = '--start' ]]; then 
     if ! pidof compton > /dev/null; then
-      $EXECXCOMP &
+        $EXECXCOMP &
     else
-      killall compton
+        killall compton
     fi
     exit 0
 fi
@@ -42,7 +46,7 @@ if [[ $1 = '--restart' ]]; then
 fi
 
 if [[ $1 = '--watch' ]]; then
-    while inotifywait -e modify "/home/$USER/.config/compton.conf"; do
+    while inotifywait -e modify ~/.config/compton.conf; do
         cb-compositor --restart
     done
     exit 0

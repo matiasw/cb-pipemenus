@@ -5,12 +5,8 @@
 # by Philip Newborough (aka corenominal) <mail@philipnewborough.co.uk>
 # ---------------------------------------------------------------------
 
-pathto=$(readlink -f "$0" | sed 's%/*[^/]\+/*$%%')
-
-if [[ -f $pathto/cb-include.cfg ]]; then
-    source "$pathto/cb-include.cfg"
-else
-    echo '  Failed to locate cb-include.cfg'
+if ! . cb-include.cfg &> /dev/null; then
+    echo '  Failed to locate cb-include.cfg in PATH' >&2
     exit 1
 fi
 
@@ -43,7 +39,6 @@ if [[ $1 = '--install-printing' ]]; then
             else
                 cb-printing-pipemenu --install-printing
             fi
-            exit 0
         else
             clear
             echo
@@ -51,12 +46,11 @@ if [[ $1 = '--install-printing' ]]; then
             echo
             echo '  Hit any key to exit...'
             read -n1 a
-            exit 0
         fi
-    else
-        exit 0
     fi
+    exit 0
 fi
+
 # Start pipemenu
 menuStart
 
@@ -69,4 +63,5 @@ fi
 
 # End pipemenu
 menuEnd
+
 exit 0

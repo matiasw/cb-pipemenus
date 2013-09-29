@@ -5,12 +5,8 @@
 # by Philip Newborough (aka corenominal) <mail@philipnewborough.co.uk>
 # ---------------------------------------------------------------------
 
-pathto=$(readlink -f "$0" | sed 's%/*[^/]\+/*$%%')
-
-if [[ -f $pathto/cb-include.cfg ]]; then # but what for?
-    source "$pathto/cb-include.cfg"
-else
-    echo '  Failed to locate cb-include.cfg'
+if ! . cb-include.cfg &> /dev/null; then
+    echo '  Failed to locate cb-include.cfg in PATH' >&2
     exit 1
 fi
 
@@ -53,38 +49,18 @@ if [[ $1 = '--install-lo' ]]; then
     fi
     exit 0
 fi
+
 # Start pipemenu
 menuStart
 
-# Writer
-if [[ -x /usr/bin/lowriter ]]; then
-    INSTALLED=true
-    menuItem 'Writer' 'lowriter'
-fi
+tools=( 'writer' 'calc' 'impress' 'draw' 'base' )
 
-# Calc
-if [[ -x /usr/bin/localc ]]; then
-    INSTALLED=true
-    menuItem 'Calc' 'localc'
-fi
-
-# Impress
-if [[ -x /usr/bin/loimpress ]]; then
-    INSTALLED=true
-    menuItem 'Impress' 'loimpress'
-fi
-
-# Draw
-if [[ -x /usr/bin/lodraw ]]; then
-    INSTALLED=true
-    menuItem 'Draw' 'lodraw'
-fi
-
-# Base
-if [[ -x /usr/bin/lobase ]]; then
-    INSTALLED=true
-    menuItem 'Base' 'lobase'
-fi
+for curTool in "${tools[@]}"; do
+    if [[ -x /usr/bin/lo$curTool ]]; then
+        INSTALLED=true
+        menuItem "${curTool^}" "lo$curTool"
+    fi
+done
 
 if [[ ! $INSTALLED ]]; then
     menuItem 'Install LibreOffice' 'cb-libreoffice-pipemenu --install'

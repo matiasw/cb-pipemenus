@@ -4,13 +4,8 @@
 # by Philip Newborough (aka corenominal) <corenominal@corenominal.org>
 # ---------------------------------------------------------------------
 
-pathto=$(readlink -f "$0" | sed 's%/*[^/]\+/*$%%')
-
-if [[ -f $pathto/cb-include.cfg ]]
-then
-    source "$pathto/cb-include.cfg"
-else
-    echo '  Failed to locate cb-include.cfg'
+if ! . cb-include.cfg &> /dev/null; then
+    echo '  Failed to locate cb-include.cfg in PATH' >&2
     exit 1
 fi
 
@@ -18,7 +13,6 @@ google_key_url_1='https://dl-ssl.google.com/linux/linux_signing_key.pub'
 google_key_url_2='http://packages.crunchbang.org/waldorf-files/apt-keys/google-chrome.key'
 opera_key_url_1='http://deb.opera.com/archive.key'
 opera_key_url_2='http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key'
-I=0
 
 if [[ $1 =~ ^--(chromium-browser|iceweasel|google-chrome|opera)$ ]]; then
     browserName=${1:2}
@@ -27,7 +21,7 @@ if [[ $1 =~ ^--(chromium-browser|iceweasel|google-chrome|opera)$ ]]; then
     exit 0
 fi
 
-if [ "$1" = "--install-chromium-browser" ]; then
+if [[ $1 = '--install-chromium-browser'  ]]; then
     clear
     echo
     echo '  INSTALL CHROMIUM BROWSER'
@@ -52,7 +46,6 @@ if [ "$1" = "--install-chromium-browser" ]; then
             else
                 cb-x-www-browser-pipemenu --install-chromium-browser
             fi
-            exit 0
         else
             clear
             echo
@@ -60,14 +53,12 @@ if [ "$1" = "--install-chromium-browser" ]; then
             echo
             echo '  Hit any key to exit...'
             read -n1 a
-            exit 0
         fi
-    else
-        exit 0
     fi
+    exit 0
 fi
 
-if [ "$1" = "--install-iceweasel" ]; then
+if [[ $1 = '--install-iceweasel' ]]; then
     clear
     echo
     echo '  INSTALL ICEWEASEL BROWSER'
@@ -92,7 +83,6 @@ if [ "$1" = "--install-iceweasel" ]; then
             else
                 cb-x-www-browser-pipemenu --install-iceweasel
             fi
-            exit 0
         else
             clear
             echo
@@ -100,14 +90,12 @@ if [ "$1" = "--install-iceweasel" ]; then
             echo
             echo '  Hit any key to exit...'
             read -n1 a
-            exit 0
         fi
-    else
-        exit 0
     fi
+    exit 0
 fi
 
-if [ "$1" = "--install-google-chrome" ]; then
+if [[ $1 = '--install-google-chrome' ]]; then
     clear
     echo
     echo '  INSTALL GOOGLE CHROME WWW BROWSER'
@@ -121,11 +109,9 @@ if [ "$1" = "--install-google-chrome" ]; then
         clear
         echo '  Adding APT key...'
         sleep 2s
-        if ! wget -O google.key ${google_key_url_1} 2> /dev/null
-        then
+        if ! wget -O google.key "$google_key_url_1" 2> /dev/null; then
             # Fallback to packages.crunchbang.org.
-            if ! wget -O google.key ${google_key_url_2} 2> /dev/null
-            then
+            if ! wget -O google.key "$google_key_url_2" 2> /dev/null; then
                 echo '  Failed to retrieve APT key from Google Inc.'
                 clear
                 exit 1
@@ -137,7 +123,7 @@ if [ "$1" = "--install-google-chrome" ]; then
         #create sources file
         echo '  Creating APT sources file...'
         sleep 2s
-        if [ -f "/etc/apt/sources.list.d/google-chrome.list" ]; then
+        if [[ -f /etc/apt/sources.list.d/google-chrome.list ]]; then
             sudo rm -f '/etc/apt/sources.list.d/google-chrome.list'
         fi
         echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee -a '/etc/apt/sources.list.d/google-chrome.list'
@@ -158,7 +144,6 @@ if [ "$1" = "--install-google-chrome" ]; then
             else
                 cb-x-www-browser-pipemenu --install-google-chrome
             fi
-            exit 0
         else
             clear
             echo
@@ -166,14 +151,12 @@ if [ "$1" = "--install-google-chrome" ]; then
             echo
             echo '  Hit any key to exit...'
             read -n1 a
-            exit 0
         fi
-    else
-        exit 0
     fi
+    exit 0
 fi
 
-if [ "$1" = "--install-opera" ]; then
+if [[ $1 = '--install-opera' ]]; then
     clear
     echo
     echo '  INSTALL OPERA WWW BROWSER'
@@ -187,11 +170,9 @@ if [ "$1" = "--install-opera" ]; then
         clear
         echo '  Adding APT key...'
         sleep 2s
-        if ! wget -O opera.key ${opera_key_url_1} 2> /dev/null
-        then
+        if ! wget -O opera.key "$opera_key_url_1" 2> /dev/null; then
             # Fallback to packages.crunchbang.org.
-            if ! wget -O opera.key ${opera_key_url_2} 2> /dev/null
-            then
+            if ! wget -O opera.key "$opera_key_url_2" 2> /dev/null; then
                 echo '  Failed to retrieve APT key from Opera Software ASA.'
                 clear
                 exit 1
@@ -213,7 +194,6 @@ if [ "$1" = "--install-opera" ]; then
 		sudo apt-get update
 		clear
         
-        
         if ! sudo apt-get install -y opera; then
             clear
             echo
@@ -224,7 +204,6 @@ if [ "$1" = "--install-opera" ]; then
             else
                 cb-x-www-browser-pipemenu --install-opera
             fi
-            exit 0
         else
             clear
             echo
@@ -232,51 +211,30 @@ if [ "$1" = "--install-opera" ]; then
             echo
             echo '  Hit any key to exit...'
             read -n1 a
-            exit 0
         fi
-    else
-        exit 0
     fi
+    exit 0
 fi
+
 # Start pipemenu
 menuStart
 
-# Chromium
-if [[ -x /usr/bin/chromium-browser ]]; then
-    ((I++))
-    menuItem 'Chromium Browser' 'chromium-browser'
-    menuItem 'Chromium Browser (Private Mode)' 'chromium-browser --incognito'
-else
-    menuItem 'Install Chromium Browser' 'cb-x-www-browser-pipemenu --chromium-browser'
-fi
+tools=( 'chromium-browser' 'iceweasel' 'google-chrome' 'opera' )
 
-# Iceweasel
-if [[ -x /usr/bin/iceweasel ]]; then
-    ((I++))
-    menuItem 'Iceweasel' 'iceweasel'
-else
-    menuItem 'Install Iceweasel' 'cb-x-www-browser-pipemenu --iceweasel'
-fi
-
-# Google Chrome
-if [[ -x /usr/bin/google-chrome ]]; then
-    ((I++))
-    menuItem 'Google Chrome' 'google-chrome'
-    menuItem 'Google Chrome (Private Mode)' 'google-chrome --incognito'
-else
-    menuItem 'Install Google Chrome' 'cb-x-www-browser-pipemenu --google-chrome'
-fi
-
-# Opera
-if [[ -x /usr/bin/opera ]]; then
-    ((I++))
-    menuItem 'Opera' 'opera'
-else
-    menuItem 'Install Opera' 'cb-x-www-browser-pipemenu --opera'
-fi
+for curTool in "${tools[@]}"; do
+    curToolName=${curTool//-/ }
+    curToolName=${curToolName~}
+    if [[ -x /usr/bin/$curTool ]]; then
+        INSTALLED=true
+        menuItem "$curToolName" "$curTool"
+        [[ $curToolName =~ 'Chrom' ]] && menuItem "$curToolName (Private Mode)" "$curTool --incognito"
+    else
+        menuItem "Install $curToolName" "cb-x-www-browser-pipemenu --$curTool"
+    fi
+done
 
 # Configure default
-if (( I > 1 )); then
+if [[ $INSTALLED ]]; then
     menuSeparator
     menuItem 'Select default browser' 'terminator --command="sudo update-alternatives --config x-www-browser"'
 fi
