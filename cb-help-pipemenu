@@ -1,5 +1,5 @@
 #!/bin/bash
-if ! . cb-include.cfg &> /dev/null; then
+if ! . cb-include.cfg 2> /dev/null; then
     echo '  Failed to locate cb-include.cfg in PATH' >&2
     exit 1
 fi

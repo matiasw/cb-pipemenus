@@ -16,44 +16,14 @@ if [[ $1 = '--install' ]]; then
 fi
 
 if [[ $1 = '--install-lo' ]]; then
-    clear
-    echo
-    echo '  INSTALL LIBREOFFICE'
-    echo '  -------------------'
-    echo '  This script will install LibreOffice.'
-    echo
-    if prompt '  Run the installer now?'; then
-        # Checking internet connection...
-        connectiontest
-        clear
-        echo '  Updating sources...'
-        sleep 2s
-        sudo apt-get update
-        clear
-        while ! sudo apt-get install -y cb-meta-libreoffice; do
-            clear
-            echo
-            echo '  There was a problem installing LibreOffice.'
-            echo
-            if prompt '  Hit any key to try again, or "q" to quit...' Q; then
-                clear
-                exit 0
-            fi
-        done
-        clear
-        echo
-        echo '  LibreOffice has been installed successfully.'
-        echo
-        echo '  Hit any key to exit...'
-        read -n1
-    fi
+    promptInstall 'LIBREOFFICE' 'LibreOffice' 'cb-meta-libreoffice'
     exit 0
 fi
 
 # Start pipemenu
 menuStart
 
-tools=( 'writer' 'calc' 'impress' 'draw' 'base' )
+tools=('writer' 'calc' 'impress' 'draw' 'base')
 
 for curTool in "${tools[@]}"; do
     if [[ -x /usr/bin/lo$curTool ]]; then

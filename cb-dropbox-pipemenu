@@ -11,7 +11,7 @@ if ! . cb-include.cfg &> /dev/null; then
 fi
 
 # Set some variables
-USERDBDIR=~/.dropbox-dist/
+USERDBDIR="$HOME/.dropbox-dist/"
 TMPFILE="/tmp/${USER}_cbdropbox/"
 
 # --------------------------------------------------------------------
@@ -31,7 +31,10 @@ fi
 if [[ $1 = '--install-dropbox' ]]; then
     zenity --question --title='Dropbox Installation' --text 'This script will install Dropbox.\nDo you want to proceed?' || exit 0
 
-    cd ~
+    if ! cd "$HOME"; then # TODO Change directory? What for? Better use absolute paths
+        echo "Unable to change directory to $HOME"
+        exit 1
+    fi
     
     platform=$(uname -m)
     platform=${platform,,}
@@ -81,15 +84,15 @@ if [[ $1 = '--install-dropbox' ]]; then
         --radiolist  --column 'Pick' --column 'Seconds:' FALSE 10 FALSE 20 FALSE 30 FALSE 40 FALSE 50 TRUE 60)
         if [[ $ans ]]; then
             echo "$ans"
-            echo >> ~/.config/openbox/autostart
-            echo '# Autostart the Dropbox deamon' >> ~/.config/openbox/autostart
-            echo "(sleep ${ans}s && ~/.dropbox-dist/dropboxd) &" >> ~/.config/openbox/autostart
-            echo >> ~/.config/openbox/autostart
+            echo >> "$HOME/.config/openbox/autostart"
+            echo '# Autostart the Dropbox deamon' >> "$HOME/.config/openbox/autostart"
+            echo "(sleep ${ans}s && ~/.dropbox-dist/dropboxd) &" >> "$HOME/.config/openbox/autostart"
+            echo >> "$HOME/.config/openbox/autostart"
         else
-            echo >> ~/.config/openbox/autostart
-            echo '# Autostart the Dropbox deamon' >> ~/.config/openbox/autostart
-            echo '~/.dropbox-dist/dropboxd &' >> ~/.config/openbox/autostart
-            echo >> ~/.config/openbox/autostart
+            echo >> "$HOME/.config/openbox/autostart"
+            echo '# Autostart the Dropbox deamon' >> "$HOME/.config/openbox/autostart"
+            echo '~/.dropbox-dist/dropboxd &' >> "$HOME/.config/openbox/autostart"
+            echo >> "$HOME/.config/openbox/autostart"
         fi
     fi
     zenity --question --title='Dropbox Installation' --text 'Do you wish to start the Dropbox client now?' || exit 0
@@ -107,7 +110,7 @@ if [[ ! -d $USERDBDIR ]]; then
     menuSeparator
     menuItem 'Find out more about Dropbox' 'x-www-browser http://db.tt/5mJg9lb'
 else
-    if [[ -d ~/Dropbox ]]; then
+    if [[ -d $HOME/Dropbox ]]; then
         menuItem 'Open Dropbox Folder' 'thunar $HOME/Dropbox'
     fi
     if ! pidof dropbox > /dev/null; then

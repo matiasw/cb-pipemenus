@@ -15,39 +15,7 @@ if [[ $1 = '--install' ]]; then
     exit 0
 fi
 if [[ $1 = '--install-printing' ]]; then
-    clear
-    echo
-    echo '  INSTALL PRINTING SUPPORT'
-    echo '  ------------------------'
-    echo '  This script will install printing support.'
-    echo
-    if prompt '  Run the installer now?'; then
-        # Checking internet connection...
-        connectiontest
-        clear
-        echo '  Updating sources...'
-        sleep 2s
-        sudo apt-get update
-        clear
-        if ! sudo apt-get install -y cb-meta-printer-support; then
-            clear
-            echo
-            echo '  There was a problem installing printing packages.'
-            echo
-            if prompt '  Hit any key to try again, or "q" to quit...' Q; then
-                clear
-            else
-                cb-printing-pipemenu --install-printing
-            fi
-        else
-            clear
-            echo
-            echo '  Printing support has been installed successfully.'
-            echo
-            echo '  Hit any key to exit...'
-            read -n1 a
-        fi
-    fi
+    promptInstall 'PRINTING SUPPORT' 'printing support' 'cb-meta-printer-support'
     exit 0
 fi
 

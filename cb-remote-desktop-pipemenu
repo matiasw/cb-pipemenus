@@ -4,7 +4,7 @@
 # by Philip Newborough (aka corenominal) <corenominal@corenominal.org>
 # ---------------------------------------------------------------------
 
-if ! . cb-include.cfg &> /dev/null; then
+if ! . cb-include.cfg 2> /dev/null; then
     echo '  Failed to locate cb-include.cfg in PATH' >&2
     exit 1
 fi
@@ -20,78 +20,12 @@ if [[ $1 = '--server' ]]; then
 fi
 
 if [[ $1 = '--install-viewer' ]]; then
-    clear
-    echo
-    echo '  INSTALL REMOTE DESKTOP CLIENT'
-    echo '  -----------------------------'
-    echo '  This script will install TightVNC Viewer.'
-    echo
-    if prompt '  Run the installer now?'; then
-        connectiontest
-        
-        #update sources
-        echo '  Updating sources...'
-        sleep 2s
-        sudo apt-get update
-        clear
-        
-        if ! sudo apt-get install -y xtightvncviewer; then
-            clear
-            echo
-            echo '  There was a problem installing TightVNC viewer.'
-            echo
-            if prompt '  Hit any key to try again, or "q" to quit...' Q; then
-                clear
-            else
-                cb-remote-desktop-pipemenu --install-viewer
-            fi
-        else
-            clear
-            echo
-            echo '  TightVNC viewer has been installed successfully.'
-            echo
-            echo '  Hit any key to exit...'
-            read -n1 a
-        fi
-    fi
+    promptInstall 'REMOTE DESKTOP CLIENT' 'TightVNC Viewer' 'xtightvncviewer'
     exit 0
 fi
 
 if [[ $1 = '--install-server' ]]; then
-    clear
-    echo
-    echo '  INSTALL REMOTE DESKTOP SERVER'
-    echo '  -----------------------------'
-    echo '  This script will install Vino VNC server.'
-    echo
-    if prompt '  Run the installer now?'; then
-        connectiontest
-        
-        #update sources
-        echo '  Updating sources...'
-        sleep 2s
-        sudo apt-get update
-        clear
-        
-        if ! sudo apt-get install -y vino; then
-            clear
-            echo
-            echo '  There was a problem installing Vino VNC server.'
-            echo
-            if prompt '  Hit any key to try again, or "q" to quit...' Q; then
-                clear
-            else
-                cb-remote-desktop-pipemenu --install-server
-            fi
-        else
-            clear
-            echo
-            echo '  Vino VNC server has been installed successfully.'
-            echo
-            echo '  Hit any key to exit...'
-            read -n1 a
-        fi
-    fi
+    promptInstall  'REMOTE DESKTOP SERVER' 'Vino VNC server' 'vino'
     exit 0
 fi
 
