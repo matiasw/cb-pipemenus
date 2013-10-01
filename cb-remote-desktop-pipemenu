@@ -11,48 +11,37 @@ fi
 
 if [[ $1 = '--viewer' ]]; then
     terminator --title='Install VNC Viewer' --command='cb-remote-desktop-pipemenu --install-viewer'
-    exit 0
-fi
-
-if [[ $1 = '--server' ]]; then
+elif [[ $1 = '--server' ]]; then
     terminator --title='Install VNC Server' --command='cb-remote-desktop-pipemenu --install-server'
-    exit 0
-fi
-
-if [[ $1 = '--install-viewer' ]]; then
+elif [[ $1 = '--install-viewer' ]]; then
     promptInstall 'REMOTE DESKTOP CLIENT' 'TightVNC Viewer' 'xtightvncviewer'
-    exit 0
-fi
-
-if [[ $1 = '--install-server' ]]; then
+elif [[ $1 = '--install-server' ]]; then
     promptInstall  'REMOTE DESKTOP SERVER' 'Vino VNC server' 'vino'
-    exit 0
-fi
-
-# Start pipemenu
-menuStart
-
-# Viewer
-if [[ -x /usr/bin/xtightvncviewer ]]; then
-    menuItem 'Viewer' 'vncviewer'
 else
-    menuItem 'Install Viewer' 'cb-remote-desktop-pipemenu --viewer'
-fi
+    # Start pipemenu
+    menuStart
 
-menuSeparator
-
-# Server
-if [[ -x /usr/lib/vino/vino-server ]]; then
-    if pidof -s vino-server > /dev/null; then
-        menuItem 'Stop VNC Server' 'killall vino-server'
+    # Viewer
+    if [[ -x /usr/bin/xtightvncviewer ]]; then
+        menuItem 'Viewer' 'vncviewer'
     else
-        menuItem 'Start VNC Server' '/usr/lib/vino/vino-server'
+        menuItem 'Install Viewer' 'cb-remote-desktop-pipemenu --viewer'
     fi
-    menuItem 'VNC Server Preferences' 'vino-preferences'
-else
-    menuItem 'Install VNC Server' 'cb-remote-desktop-pipemenu --server'
+
+    menuSeparator
+
+    # Server
+    if [[ -x /usr/lib/vino/vino-server ]]; then
+        if pidof -s vino-server > /dev/null; then
+            menuItem 'Stop VNC Server' 'killall vino-server'
+        else
+            menuItem 'Start VNC Server' '/usr/lib/vino/vino-server'
+        fi
+        menuItem 'VNC Server Preferences' 'vino-preferences'
+    else
+        menuItem 'Install VNC Server' 'cb-remote-desktop-pipemenu --server'
+    fi
+
+    menuEnd
 fi
-
-menuEnd
-
 exit 0

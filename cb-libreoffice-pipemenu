@@ -12,30 +12,26 @@ fi
 
 if [[ $1 = '--install' ]]; then
     terminator --title='Install LibreOffice' --command='cb-libreoffice-pipemenu --install-lo'
-    exit 0
-fi
-
-if [[ $1 = '--install-lo' ]]; then
+elif [[ $1 = '--install-lo' ]]; then
     promptInstall 'LIBREOFFICE' 'LibreOffice' 'cb-meta-libreoffice'
-    exit 0
-fi
+else
+    # Start pipemenu
+    menuStart
 
-# Start pipemenu
-menuStart
+    tools=('writer' 'calc' 'impress' 'draw' 'base')
 
-tools=('writer' 'calc' 'impress' 'draw' 'base')
+    for curTool in "${tools[@]}"; do
+        if [[ -x /usr/bin/lo$curTool ]]; then
+            INSTALLED=true
+            menuItem "${curTool^}" "lo$curTool"
+        fi
+    done
 
-for curTool in "${tools[@]}"; do
-    if [[ -x /usr/bin/lo$curTool ]]; then
-        INSTALLED=true
-        menuItem "${curTool^}" "lo$curTool"
+    if [[ ! $INSTALLED ]]; then
+        menuItem 'Install LibreOffice' 'cb-libreoffice-pipemenu --install'
     fi
-done
 
-if [[ ! $INSTALLED ]]; then
-    menuItem 'Install LibreOffice' 'cb-libreoffice-pipemenu --install'
+    # End pipemenu
+    menuEnd
 fi
-
-# End pipemenu
-menuEnd
 exit 0

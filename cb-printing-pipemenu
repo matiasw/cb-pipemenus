@@ -12,24 +12,20 @@ fi
 
 if [[ $1 = '--install' ]]; then
     terminator --title='Install Printer Support' --command='cb-printing-pipemenu --install-printing'
-    exit 0
-fi
-if [[ $1 = '--install-printing' ]]; then
+elif [[ $1 = '--install-printing' ]]; then
     promptInstall 'PRINTING SUPPORT' 'printing support' 'cb-meta-printer-support'
-    exit 0
-fi
-
-# Start pipemenu
-menuStart
-
-# check for system-config-printer
-if [[ -x /usr/bin/system-config-printer ]]; then
-    menuItem 'Configure Printers' 'gksudo system-config-printer'
 else
-    menuItem 'Install Printing Support' 'cb-printing-pipemenu --install'
+    # Start pipemenu
+    menuStart
+
+    # check for system-config-printer
+    if [[ -x /usr/bin/system-config-printer ]]; then
+        menuItem 'Configure Printers' 'gksudo system-config-printer'
+    else
+        menuItem 'Install Printing Support' 'cb-printing-pipemenu --install'
+    fi
+
+    # End pipemenu
+    menuEnd
 fi
-
-# End pipemenu
-menuEnd
-
 exit 0
