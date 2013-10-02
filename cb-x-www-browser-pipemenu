@@ -7,7 +7,7 @@
 
 # In order to add another browser, simply add it to this array:
 TOOLS=('chromium-browser' 'iceweasel' 'google-chrome' 'opera')
-# If the package needs additional configuration before installation simply create a function called setupXxxxXxxx, it will be called automatically.
+# If the package needs additional configuration before installation simply create a function called setupBrowserName, it will be called automatically.
 
 KEY_URLS_GOOGLE=('https://dl-ssl.google.com/linux/linux_signing_key.pub' 'http://packages.crunchbang.org/waldorf-files/apt-keys/google-chrome.key')
 KEY_URLS_OPERA=('http://deb.opera.com/archive.key' 'http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key')
@@ -19,27 +19,26 @@ fi
 
 browserExists() {
     for curTool in "${tools[@]}"; do # if $packageName exists in tools array
-        if [[ $curTool = "$1" ]]; do
-            echo "  Unable to install $1. There is no such browser that I know of." >&2
-            return 0
-        done
+        [[ $curTool = "$1" ]] && return 0
     done
+    echo "  Unable to install $1. There is no such browser that I know of." >&2
+    echo "  You can try one of these: ${TOOLS[@]}" >&2
     return 1
 }
 
 addAptKey() {
     clear
     echo '  Adding APT key...'
-    sleep 1
+    keyFile=$(mktemp -u)
     for curArg; do
-        wget -O apt.key "$curKey" 2> /dev/null && break; # success. No need to try other keys
+        wget -O "$keyFile" "$curKey" 2> /dev/null && break; # success. No need to try other keys
     done
     if [[ &? != 0 ]]; then
         echo '  Failed to retrieve APT key' >&2
         exit 1
     fi
-    sudo apt-key add apt.key
-    rm -f apt.key
+    sudo apt-key add "$keyFile"
+    rm -f "$keyFile"
 }
 
 setupGoogleChrome() {
@@ -105,17 +104,16 @@ elif [[ $1 = --install-* ]]; then
             fi
         fi
     done
-else
-    # Start pipemenu
+else # pipemenu
     menuStart
-
     for curTool in "${TOOLS[@]}"; do
         curToolName=${curTool//-/ }
         curToolName=${curToolName~}
         if [[ -x /usr/bin/$curTool ]]; then
             INSTALLED=true
             menuItem "$curToolName" "$curTool"
-            [[ $curToolName =~ 'Chrom' ]] && menuItem "$curToolName (Private Mode)" "$curTool --incognito" # Incognito mode for chrome and chromium
+            [[ $curToolName =~ 'Chrom' ]] &&
+                menuItem "$curToolName (Private Mode)" "$curTool --incognito" # Incognito mode for chrome and chromium
         else
             menuItem "Install $curToolName" "cb-x-www-browser-pipemenu --$curTool"
         fi
@@ -125,8 +123,6 @@ else
         menuSeparator
         menuItem 'Select default browser' 'terminator --command="sudo update-alternatives --config x-www-browser"'
     fi
-
-    # End pipemenu
     menuEnd
 fi
 exit 0
