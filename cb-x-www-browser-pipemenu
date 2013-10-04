@@ -13,47 +13,50 @@ KEY_URLS_GOOGLE=('https://dl-ssl.google.com/linux/linux_signing_key.pub' 'http:/
 KEY_URLS_OPERA=('http://deb.opera.com/archive.key' 'http://packages.crunchbang.org/waldorf-files/apt-keys/opera.key')
 
 if ! . cb-include.cfg 2> /dev/null; then
-    echo '  Failed to locate cb-include.cfg in PATH' >&2
+    say 'Failed to locate cb-include.cfg in PATH' >&2
     exit 1
 fi
 
 browserExists() {
-    for curTool in "${tools[@]}"; do # if $packageName exists in tools array
-        [[ $curTool = "$1" ]] && return 0
+    for curTool in "${TOOLS[@]}"; do # if $packageName exists in tools array
+        [[ $curTool = "$1" ]] &&
+            return 0
     done
-    echo "  Unable to install $1. There is no such browser that I know of." >&2
-    echo "  You can try one of these: ${TOOLS[@]}" >&2
+    say "Unable to install $1. There is no such browser that I know of." >&2
+    say "You can try one of these: ${TOOLS[@]}" >&2
     return 1
 }
 
 addAptKey() {
     clear
-    echo '  Adding APT key...'
+    say 'Adding APT key...'
     keyFile=$(mktemp -u)
-    for curArg; do
+    for curKey; do
         wget -O "$keyFile" "$curKey" 2> /dev/null && break; # success. No need to try other keys
+        say "Failed to retrieve key from $curKey . Trying another source..."
     done
-    if [[ &? != 0 ]]; then
-        echo '  Failed to retrieve APT key' >&2
-        exit 1
+    if [[ $? != 0 ]]; then
+        say 'Failed to retrieve APT key!' >&2
+        return 1
     fi
     sudo apt-key add "$keyFile"
     rm -f "$keyFile"
+    return 0
 }
 
 setupGoogleChrome() {
-    addAptKey "${KEY_URLS_GOOGLE[@]}"
-    echo '  Creating APT sources file...'
+    addAptKey "${KEY_URLS_GOOGLE[@]}" || return 1
+    say 'Creating APT sources file...' 1
     echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee '/etc/apt/sources.list.d/google-chrome.list'
 }
 
 setupOpera() {
-    addAptKey "${KEY_URLS_OPERA[@]}"
-    echo '  Creating APT sources file...'
-    echo 'deb http://deb.opera.com/opera/ stable non-free' | sudo tee /etc/apt/sources.list.d/opera.list
+    addAptKey "${KEY_URLS_OPERA[@]}" || return 1
+    say 'Creating APT sources file...' 1
+    echo 'deb http://deb.opera.com/opera/ stable non-free' | sudo tee '/etc/apt/sources.list.d/opera.list'
 }
 
-if [[ $1 !=~ --install-* ]]; then
+if [[ $1 && ! $1 =~ --install-* ]]; then
     browserExists "${1:2}" || exit 1
     browserName=${1:2}
     browserName=${browserName//-/ }
@@ -68,41 +71,45 @@ elif [[ $1 = --install-* ]]; then
     browserExists "$packageName" || exit 1
 
     while true; do # do it until the package is successfully installed or user wants to exit
-        clear
-        echo
-        echo "  INSTALL ${browserNameUpper% BROWSER} BROWSER"
-        echo '  ------------------------'
-        echo "  This script will install $browserName."
-        echo
-        if prompt '  Run the installer now?'; then
-            connectiontest
-            
-            setupFunctionName="setup${browserName//[^a-zA-Z]/}" # setupFunctionName should now be in format like 'setupChromiumBrowser'
-            [[ $(type -t "$setupFunctionName") == 'function' ]] && "$setupFunctionName" # run setup function if it exists
-            
-            clear
-            echo '  Updating sources...'
-            sleep 1
-            sudo apt-get update
-            clear
-            if ! sudo apt-get install -y "$packageName"; then
-                clear
-                echo
-                echo "  There was a problem installing $browserName."
-                echo
-                if prompt '  Hit any key to try again, or "q" to quit...' Q; then
-                    clear
-                    break
-                fi
-            else
-                clear
-                echo
-                echo "  $browserName has been installed successfully."
-                echo
-                echo '  Hit any key to exit...'
-                read -srn1
-            fi
+        if [[ $TRYAGAIN ]]; then # previous try failed
+            say
+            say "There was a problem installing $browserName."
+            say
+            prompt '  Hit any key to try again, or "q" to quit...' Q && break
         fi
+        TRYAGAIN=true
+        
+        clear
+        say
+        say "INSTALL ${browserNameUpper% BROWSER} BROWSER"
+        say '------------------------'
+        say "This script will install $browserName."
+        say
+        prompt '  Run the installer now?' || break
+        
+        clear
+        connectiontest 1 || continue
+        
+        setupFunctionName="setup${browserName//[^a-zA-Z]/}" # setupFunctionName should now be in format like 'setupChromiumBrowser'
+        if [[ $(type -t "$setupFunctionName") == 'function' ]]; then
+            "$setupFunctionName" || continue # run setup function if it exists
+        fi
+        
+        clear
+        say 'Updating sources...' 1
+        sudo apt-get update
+        
+        clear
+        say 'Installing package...' 1
+        sudo apt-get install -y "$packageName" || continue
+        
+        clear
+        say
+        say "$browserName has been installed successfully."
+        say
+        say 'Hit any key to exit...'
+        read -srn1
+        break
     done
 else # pipemenu
     menuStart

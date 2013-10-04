@@ -5,17 +5,25 @@
 # by Philip Newborough (aka corenominal) <mail@philipnewborough.co.uk>
 # --------------------------------------------------------------------
 
+PROMPT_DELAY_TEXT='It is a good idea to add a delay before autostarting Dropbox
+so that your system can establish a working network connection.
+
+Select the number of seconds to delay Dropbox autostarting.
+Click "Cancel" if you do not want to add a delay.'
+PROMPT_DELAY_VARIANTS=(FALSE 10 FALSE 20 FALSE 30 FALSE 40 FALSE 50 TRUE 60)
+
+USERDBDIR="$HOME/.dropbox-dist/"
+
+
 if ! . cb-include.cfg 2> /dev/null; then
     echo '  Failed to locate cb-include.cfg in PATH' >&2
     exit 1
 fi
 
-# Set some variables
-USERDBDIR="$HOME/.dropbox-dist/"
-
 # --------------------------------------------------------------------
 # manipulation
 # --------------------------------------------------------------------
+
 if [[ $1 = '--start-dropbox' ]]; then
     "$USERDBDIR/dropboxd" &
     
@@ -24,7 +32,7 @@ elif [[ $1 = '--stop-dropbox' ]]; then
     
 elif [[ $1 = '--install-dropbox' ]]; then
     zenity --question --title='Dropbox Installation' --text 'This script will install Dropbox.\nDo you want to proceed?' || exit 0
-
+    
     if ! cd "$HOME"; then # TODO Change directory? What for? Better use absolute paths
         echo "Unable to change directory to $HOME"
         exit 1
@@ -32,8 +40,9 @@ elif [[ $1 = '--install-dropbox' ]]; then
     
     platform=$(uname -m)
     platform=${platform,,}
+    
     case $platform in
-    "x86_64")
+    'x86_64')
         #DROPBOXURL='http://packages.crunchbang.org/waldorf-files/dropbox/64/dropbox.tar.gz'
         DROPBOXURL='http://www.dropbox.com/download?plat=lnx.x86_64'
         ;;
@@ -62,7 +71,7 @@ elif [[ $1 = '--install-dropbox' ]]; then
         zenity --warning --title='Dropbox Installation' --text 'Error, failed to contact server. Please try again later.'
         exit 1
     fi
-
+    
     #extract binary
     tar -xf "$dropboxFile"
     #delete binary
@@ -76,8 +85,7 @@ elif [[ $1 = '--install-dropbox' ]]; then
     zenity --info --title='Dropbox Installation' --text "Dropbox has been installed to:\n$USERDBDIR"
     zenity --question --title='Dropbox Installation' --text 'Dropbox can be started automatically when you start your session. Would you like to autostart Dropbox when you login?'
     if [[ $? = 0 ]]; then # add to autostart!
-        ans=$(zenity  --title='Dropbox Installation' --list  --text 'It is a good idea to add a delay before autostarting Dropbox\nso that your system can establish a working network connection.\n\nSelect the number of seconds to delay Dropbox autostarting.\nClick "Cancel" if you do not want to add a delay.' \
-        --radiolist  --column 'Pick' --column 'Seconds:' FALSE 10 FALSE 20 FALSE 30 FALSE 40 FALSE 50 TRUE 60)
+        ans=$(zenity  --title='Dropbox Installation' --list --text  "$PROMPT_DELAY_TEXT" --radiolist  --column 'Pick' --column 'Seconds:' "${PROMPT_DELAY_VARIANTS[@]}")
         if [[ $? = 0 ]]; then
             echo >> "$HOME/.config/openbox/autostart"
             echo '# Autostart the Dropbox deamon' >> "$HOME/.config/openbox/autostart"
@@ -86,9 +94,8 @@ elif [[ $1 = '--install-dropbox' ]]; then
         fi
     fi
     zenity --question --title='Dropbox Installation' --text 'Do you wish to start the Dropbox client now?' || exit 0
-
+    
     "$USERDBDIR/dropboxd" &
-    exit 0
 else
     # pipemenu stuff
     menuStart

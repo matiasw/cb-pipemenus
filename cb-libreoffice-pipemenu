@@ -29,9 +29,8 @@ else
         fi
     done
 
-    if [[ ! $INSTALLED ]]; then
+    [[ ! $INSTALLED ]] &&
         menuItem 'Install LibreOffice' 'cb-libreoffice-pipemenu --install'
-    fi
     
     menuEnd
 fi
